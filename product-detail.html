@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail - SimSim eBook Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalog.html">All Books & Videos</a>
+            <!-- Coloring Studio Link (Managed dynamically by app.js) -->
+            <span id="nav-coloring-container">
+                <a href="#" onclick="alert('Please log in and purchase a coloring activity book to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Requires Login">🎨 Coloring Studio (Locked)</a>
+            </span>
+            <a href="dashboard.html" id="nav-dashboard">My Library 📚</a>
+            <a href="login.html" id="nav-login">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div id="product-detail-container" style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); display: flex; flex-wrap: wrap; gap: 2rem;">
+            <!-- Loaded dynamically -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <!-- Essential Scripts -->
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const container = document.getElementById("product-detail-container");
+
+            if (typeof SIMSIM_PRODUCTS === "undefined") {
+                container.innerHTML = "<h2>Product database not loaded! 🎈</h2><p><a href='catalog.html' class='btn'>Back to Catalog</a></p>";
+                return;
+            }
+
+            const product = SIMSIM_PRODUCTS.find(p => p.id === productId);
+
+            if (!product) {
+                container.innerHTML = "<h2>Product not found! 🎈</h2><p><a href='catalog.html' class='btn'>Back to Catalog</a></p>";
+                return;
+            }
+
+            // Safely get images array or fallback to single coverImage
+            const imagesList = (product.images && product.images.length > 0) ? product.images : [product.coverImage];
+
+            container.innerHTML = `
+                <div style="flex: 1; min-width: 280px; max-width: 400px; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Main Preview Image -->
+                    <img id="main-preview-img" src="${imagesList[0]}" alt="${product.title}" style="width: 100%; height: 320px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    
+                    <!-- Thumbnails Gallery Row -->
+                    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                        ${imagesList.map((img, idx) => `
+                            <img src="${img}" alt="Thumbnail ${idx + 1}" onclick="changeMainImage('${img}')" style="width: 70px; height: 70px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid ${idx === 0 ? 'var(--primary-color)' : '#ddd'}; transition: border 0.2s;" class="thumb-img">
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="flex: 2; min-width: 280px; display: flex; flex-direction: column;">
+                    <span class="badge" style="margin-bottom: 10px; width: fit-content;">${product.category} • ${product.ageGroup}</span>
+                    <h1 style="font-size: 2rem; margin-bottom: 1rem;">${product.title}</h1>
+                    <p style="font-size: 1.1rem; color: #555; margin-bottom: 1.5rem; line-height: 1.8;">${product.description}</p>
+                    <div class="price" style="font-size: 1.8rem; margin-bottom: 1.5rem;">$${product.price.toFixed(2)}</div>
+                    
+                    ${product.type === 'video' ? '<p style="color: #2b6cb0; font-weight: bold; margin-bottom: 1rem;">▶ Includes full HD streaming video access!</p>' : ''}
+                    ${product.type === 'coloring-activity' ? '<p style="color: #2b6cb0; font-weight: bold; margin-bottom: 1rem;">🎨 Unlocks access to the Interactive Coloring Studio!</p>' : ''}
+                    ${product.type === 'book' ? '<p style="color: #2b6cb0; font-weight: bold; margin-bottom: 1rem;">📥 Instant high-resolution PDF download included!</p>' : ''}
+
+                    <button class="btn" onclick="addToCart('${product.id}')" style="font-size: 1.1rem; padding: 12px 24px; width: fit-content; margin-top: auto;">Add to Cart & Checkout 🎒</button>
+                </div>
+            `;
+        });
+
+        // Function to switch main preview image when clicking a thumbnail
+        function changeMainImage(imgUrl) {
+            document.getElementById("main-preview-img").src = imgUrl;
+        }
+    </script>
+</body>
+</html>
