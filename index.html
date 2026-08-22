@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimSim eBook Store - Magical Kids Books & Videos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <nav>
+            <a href="index.html" class="active">Home</a>
+            <a href="catalog.html">All Books & Videos</a>
+            <!-- Coloring Studio Link (Managed dynamically by app.js) -->
+            <span id="nav-coloring-container">
+                <a href="#" onclick="alert('Please log in and purchase a coloring activity book to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Requires Login & Coloring Book">🎨 Coloring Studio (Locked)</a>
+            </span>
+            <a href="dashboard.html" id="nav-dashboard">My Library 📚</a>
+            <a href="login.html" id="nav-login">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Welcome to SimSim eBook Store! 🚀</h1>
+        <p>Explore magical comic books, interactive coloring activities, and bedtime video tales.</p>
+    </section>
+
+    <main class="container">
+        <h2 class="section-title">✨ Featured Stories & Videos</h2>
+        <div class="product-grid" id="featured-products">
+            <!-- Products injected dynamically via app.js -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

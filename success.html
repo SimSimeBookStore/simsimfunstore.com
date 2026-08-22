@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - SimSim eBook Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalog.html">All Books & Videos</a>
+            <a href="dashboard.html">My Library 📚</a>
+        </nav>
+    </header>
+
+    <main class="container" style="max-width: 700px; text-align: center;">
+        <div style="background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+            <h1 style="color: #2b6cb0; margin-bottom: 1rem;">Payment Successful!</h1>
+            <p style="font-size: 1.1rem; color: #555; margin-bottom: 2rem;">Thank you for your purchase. Your digital items have been successfully unlocked and added to your permanent library!</p>
+            
+            <div id="purchased-items-list" style="text-align: left; margin-bottom: 2rem; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 1.5rem 0;">
+                <!-- Dynamically rendered purchased files -->
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="dashboard.html" class="btn" style="background: #4ECDC4;">Go to My Library Dashboard 📖</a>
+                <a href="index.html" class="btn">Back to Home 🌟</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const listContainer = document.getElementById("purchased-items-list");
+            const pendingCheckout = JSON.parse(localStorage.getItem("simsim_pending_checkout")) || null;
+            const cart = pendingCheckout && Array.isArray(pendingCheckout.items)
+                ? pendingCheckout.items
+                : (JSON.parse(localStorage.getItem("simsim_cart")) || []);
+            const user = localStorage.getItem("simsim_user") || (pendingCheckout && pendingCheckout.user);
+
+            if (cart.length === 0) {
+                listContainer.innerHTML = "<p style='text-align: center; color: #666;'>No active cart items found. Check your Library Dashboard to view your purchased content.</p>";
+                return;
+            }
+
+            // Save items permanently to the signed-in account library.
+            if (user) {
+                let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+                cart.forEach(cartItem => {
+                    if (!userLibrary.some(item => item.id === cartItem.id)) {
+                        userLibrary.push(cartItem);
+                    }
+                });
+                localStorage.setItem(`simsim_library_${user}`, JSON.stringify(userLibrary));
+            } else {
+                alert("Notice: You are not logged in. Please log in before checkout so items save to your permanent library!");
+            }
+
+            // Render purchased items with proper preview images and buttons[cite: 3]
+            listContainer.innerHTML = `<h3>Your Unlocked Items:</h3>` + cart.map(item => {
+                const coverImage = item.coverImage || (item.images && item.images.length > 0 ? item.images[0] : '');
+                let actionBtn = '';
+
+                if (item.type === 'video') {
+                    actionBtn = `<a href="video-player.html?id=${encodeURIComponent(item.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Watch Video ▶</a>`;
+                } else if (item.type === 'coloring-activity') {
+                    actionBtn = `<a href="coloring.html?book=${item.id}" class="btn" style="background: #4ECDC4; padding: 6px 14px; font-size: 0.9rem;">Open Studio 🎨</a>`;
+                } else {
+                    actionBtn = `<a href="${item.downloadUrl}" download class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Download PDF 📥</a>`;
+                }
+
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background: #f7fafc; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${coverImage}" alt="${item.title}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
+                            <div>
+                                <strong>${item.title}</strong>
+                                <div style="font-size: 0.85rem; color: #666;">${item.category}</div>
+                            </div>
+                        </div>
+                        <div>${actionBtn}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Clear both active and pending checkout state after fulfillment.
+            localStorage.removeItem("simsim_cart");
+            localStorage.removeItem("simsim_pending_checkout");
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

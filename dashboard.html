@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library Dashboard - SimSim eBook Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalog.html">All Books & Videos</a>
+            <span id="nav-coloring-container">
+                <a href="#" style="color: #A0AEC0; cursor: not-allowed;">🎨 Coloring Studio (Locked)</a>
+            </span>
+            <a href="#" onclick="logout()" style="color: #e53e3e;">Sign Out 🚪</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 class="section-title" style="margin-bottom: 5px;">📖 Parent's Digital Bookshelf</h2>
+                <p id="user-display" style="color: #666;"></p>
+            </div>
+            <a href="catalog.html" class="btn" style="background: #4ECDC4;">+ Buy More Books</a>
+        </div>
+
+        <div class="product-grid" id="user-library">
+            <!-- Loaded dynamically from user library storage -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = localStorage.getItem("simsim_user");
+            if (!user) {
+                alert("Please log in to access your digital library.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("user-display").textContent = `Logged in as: ${user}`;
+            const libraryContainer = document.getElementById("user-library");
+
+            // Recover a completed checkout if PayPal skipped the success page.
+            const pendingCheckout = JSON.parse(localStorage.getItem("simsim_pending_checkout")) || null;
+            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            if (pendingCheckout && Array.isArray(pendingCheckout.items) &&
+                (!pendingCheckout.user || pendingCheckout.user === user)) {
+                pendingCheckout.items.forEach(item => {
+                    if (!userLibrary.some(libraryItem => libraryItem.id === item.id)) {
+                        userLibrary.push(item);
+                    }
+                });
+                localStorage.setItem(`simsim_library_${user}`, JSON.stringify(userLibrary));
+                localStorage.removeItem("simsim_cart");
+                localStorage.removeItem("simsim_pending_checkout");
+            }
+
+            if (userLibrary.length === 0) {
+                libraryContainer.innerHTML = "<p style='color: #666;'>Your library is empty. Purchase a book or video from the catalog to see it here permanently! 📚</p>";
+                return;
+            }
+
+            // Render unlocked user items with specific buttons for videos, coloring studio, or PDF downloads
+            libraryContainer.innerHTML = userLibrary.map(product => {
+                let actionButton = '';
+
+                if (product.type === 'video') {
+                    actionButton = `<a href="video-player.html?id=${encodeURIComponent(product.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Watch Video ▶</a>`;
+                } else if (product.type === 'coloring-activity') {
+                    actionButton = `<a href="coloring.html?book=${product.id}" class="btn" style="background: #4ECDC4; text-align: center; display: block; margin-top: auto;">Open in Coloring Studio 🎨</a>`;
+                } else {
+                    actionButton = `<a href="${product.downloadUrl}" download class="btn" style="text-align: center; display: block; margin-top: auto;">Download PDF 📥</a>`;
+                }
+
+                return `
+                    <div class="product-card">
+                        <img src="${product.coverImage || (product.images && product.images[0])}" alt="${product.title}">
+                        <div class="product-info">
+                            <span class="badge">Unlocked 🔓</span>
+                            <h3>${product.title}</h3>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">${product.ageGroup}</p>
+                            ${actionButton}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+    </script>
+</body>
+</html>
