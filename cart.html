@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - SimSim eBook Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalog.html">All Books & Videos</a>
+            <span id="nav-coloring-container">
+                <a href="#" style="color: #A0AEC0; cursor: not-allowed;">🎨 Coloring Studio (Locked)</a>
+            </span>
+            <a href="dashboard.html" id="nav-dashboard">My Library 📚</a>
+            <a href="login.html" id="nav-login">Parent Login</a>
+            <a href="cart.html" class="active">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title">🎒 Your Shopping Cart</h2>
+        
+        <!-- Cart Items List Container -->
+        <div id="cart-items-container" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+            <!-- Cart items render here dynamically -->
+        </div>
+
+        <!-- Checkout Section -->
+        <div id="checkout-section" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: none;">
+            <h3>🔒 Secure Parent Checkout</h3>
+            <p style="margin: 10px 0; color: #666;">You can checkout instantly as a <strong>Guest</strong> or log into your account to save items to your permanent digital library.</p>
+            
+            <div style="margin-top: 1.5rem; display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn" style="background: #0070ba;" onclick="payWithPayPal()">Pay with PayPal 🅿️</button>
+            </div>
+            <p id="payment-status" style="margin-top: 1rem; color: #666;"></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Function to load and render cart items with remove/delete capability
+        function renderCart() {
+            const container = document.getElementById("cart-items-container");
+            const checkoutSection = document.getElementById("checkout-section");
+            const cart = JSON.parse(localStorage.getItem("simsim_cart")) || [];
+
+            // Update top nav cart count from app.js if available
+            if (typeof updateCartCount === 'function') {
+                updateCartCount();
+            }
+
+            if (cart.length === 0) {
+                container.innerHTML = "<p style='text-align: center; color: #666; padding: 20px;'>Your cart is empty! Time to explore some stories. 📚</p>";
+                checkoutSection.style.display = "none";
+                return;
+            }
+
+            checkoutSection.style.display = "block";
+            let total = 0;
+
+            container.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                // Safely grab image from coverImage or the first item of the images array[cite: 4]
+                const itemImage = item.coverImage || (item.images && item.images.length > 0 ? item.images[0] : '');
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="${itemImage}" alt="${item.title}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                            <div>
+                                <h4 style="font-size: 1.1rem; margin-bottom: 2px;">${item.title}</h4>
+                                <span style="font-size: 0.85rem; color: #888;">${item.category}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <strong style="color: var(--primary-color); font-size: 1.1rem;">$${item.price.toFixed(2)}</strong>
+                            <button onclick="removeFromCart(${index})" style="background: #fed7d7; color: #c53030; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;">Delete 🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('') + `
+                <div style="margin-top: 20px; text-align: right;">
+                    <h3 style="font-size: 1.4rem;">Total: $${total.toFixed(2)}</h3>
+                </div>
+            `;
+        }
+
+        // Function to delete a specific item from the cart based on its list position (index)
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem("simsim_cart")) || [];
+            cart.splice(index, 1); // Remove item at the specific index
+            localStorage.setItem("simsim_cart", JSON.stringify(cart));
+            renderCart(); // Refresh cart view immediately
+        }
+
+        let paypalWindowMonitor = null;
+
+        // PayPal.Me does not provide a return callback, so use the original tab as the return path.
+        function payWithPayPal() {
+            if (!localStorage.getItem("simsim_user")) {
+                alert("Please sign in before buying an item.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem("simsim_cart")) || [];
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            const paypalUsername = "SimSimeBookStore"; 
+
+            localStorage.setItem("simsim_pending_checkout", JSON.stringify({
+                items: cart,
+                user: localStorage.getItem("simsim_user"),
+                createdAt: Date.now()
+            }));
+
+            const paypalUrl = `https://paypal.me/${paypalUsername}/${total.toFixed(2)}`;
+            const paypalWindow = window.open(paypalUrl, "_blank");
+
+            if (!paypalWindow) {
+                document.getElementById("payment-status").innerHTML =
+                    "PayPal was blocked by your browser. Allow pop-ups, then " +
+                    "<a href=\"" + paypalUrl + "\" target=\"_blank\" rel=\"noopener\" style=\"color: var(--primary-color); font-weight: bold;\">open PayPal</a>.";
+                return;
+            }
+
+            document.getElementById("payment-status").innerHTML =
+                "Complete payment in the PayPal tab. This page will return to your library when that tab is closed. " +
+                "<a href=\"success.html\" style=\"color: var(--primary-color); font-weight: bold;\">Complete checkout now</a>.";
+
+            clearInterval(paypalWindowMonitor);
+            paypalWindowMonitor = setInterval(() => {
+                if (paypalWindow.closed) {
+                    clearInterval(paypalWindowMonitor);
+                    window.location.href = "success.html";
+                }
+            }, 500);
+        }
+
+        // Run render on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCart();
+        });
+    </script>
+</body>
+</html>
