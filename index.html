@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimSim eBook Store - Magical Kids Books & Videos</title>
+    <title>SimSim Fun Store - Magical Kids Books & Videos</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo">🌟 SimSim Fun Store</a>
         <nav>
             <a href="index.html" class="active">Home</a>
             <a href="catalog.html">All Books & Videos</a>
@@ -24,19 +24,37 @@
     </header>
 
     <section class="hero">
-        <h1>Welcome to SimSim eBook Store! 🚀</h1>
-        <p>Explore magical comic books, interactive coloring activities, and bedtime video tales.</p>
+        <div class="hero-confetti" aria-hidden="true"><span>✦</span><span>●</span><span>✦</span><span>●</span></div>
+        <div class="hero-content">
+            <p class="hero-kicker">Stories, colors, and big imaginations</p>
+            <h1>Welcome to SimSim Fun Store! 🚀</h1>
+            <p>Explore magical comic books, interactive coloring activities, and bedtime video tales.</p>
+            <div class="hero-actions">
+                <a href="catalog.html" class="hero-button hero-button-primary">Explore the collection ✨</a>
+                <a href="dashboard.html" class="hero-button hero-button-secondary">Open My Library 📚</a>
+            </div>
+        </div>
     </section>
 
-    <main class="container">
-        <h2 class="section-title">✨ Featured Stories & Videos</h2>
+    <main class="container home-products">
+        <div class="home-intro">
+            <div>
+                <p class="home-kicker">Pick your next adventure</p>
+                <h2 class="section-title">✨ Featured Stories & Videos</h2>
+            </div>
+            <div class="category-chips" aria-label="Store categories">
+                <span class="category-chip chip-coral">📚 Story books</span>
+                <span class="category-chip chip-teal">🎨 Coloring fun</span>
+                <span class="category-chip chip-yellow">🎬 Video tales</span>
+            </div>
+        </div>
         <div class="product-grid" id="featured-products">
             <!-- Products injected dynamically via app.js -->
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
     </footer>
 
     <!-- Scripts -->

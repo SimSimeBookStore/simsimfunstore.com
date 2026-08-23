@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Login - SimSim eBook Store</title>
+    <title>Parent Login - SimSim Fun Store</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo">🌟 SimSim Fun Store</a>
         <nav>
             <a href="index.html">Home</a>
             <a href="catalog.html">All Books & Videos</a>
@@ -18,35 +18,45 @@
         </nav>
     </header>
 
-    <main class="container" style="max-width: 450px; margin-top: 3rem;">
-        <div style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);">
-            <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">🔐 Parent Portal Login</h2>
+    <main class="container login-shell">
+        <div class="login-card">
+            <div class="login-heading">
+                <span class="login-mark" aria-hidden="true">🔐</span>
+                <p class="eyebrow">SimSim Fun Store</p>
+                <h1>Parent Portal</h1>
+                <p>Sign in to access your purchases on any device.</p>
+            </div>
             
             <form id="login-form" onsubmit="handleLogin(event)">
-                <div style="margin-bottom: 1.2rem;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #444;">Email Address</label>
-                    <input type="email" id="login-email" required autocomplete="username" placeholder="parent@example.com" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;">
+                <div class="form-field">
+                    <label for="login-email">Email address</label>
+                    <input type="email" id="login-email" required autocomplete="username" placeholder="parent@example.com">
                 </div>
 
-                <div style="margin-bottom: 1.2rem;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #444;">Password</label>
-                    <input type="password" id="login-password" required minlength="6" autocomplete="current-password" placeholder="••••••••" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;">
+                <div class="form-field">
+                    <label for="login-password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="login-password" required minlength="6" autocomplete="current-password" placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Show password">Show</button>
+                    </div>
                 </div>
 
-                <!-- Keep Me Logged In Checkbox -->
-                <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;">
-                    <input type="checkbox" id="remember-me" checked style="width: 18px; height: 18px; cursor: pointer;">
-                    <label for="remember-me" style="font-size: 0.95rem; color: #555; cursor: pointer;">Keep me logged in</label>
+                <div class="login-options">
+                    <label class="remember-option"><input type="checkbox" id="remember-me" checked> <span>Keep me signed in</span></label>
                 </div>
 
-                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 1.05rem;">Sign In 🚀</button>
-                <button type="button" class="btn" onclick="registerAccount()" style="width: 100%; padding: 10px; margin-top: 10px; background: #4ECDC4;">Create New Account</button>
+                <div class="login-actions">
+                    <button type="submit" class="btn primary-action">Sign In 🚀</button>
+                    <button type="button" class="btn secondary-action" onclick="registerAccount()">Create New Account</button>
+                </div>
             </form>
+
+            <p class="login-note">Your purchases and library are linked to your Supabase account.</p>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -64,6 +74,15 @@
             const data = new TextEncoder().encode(password);
             const hash = await crypto.subtle.digest("SHA-256", data);
             return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById("login-password");
+            const toggleButton = document.querySelector(".password-toggle");
+            const isHidden = passwordInput.type === "password";
+            passwordInput.type = isHidden ? "text" : "password";
+            toggleButton.textContent = isHidden ? "Hide" : "Show";
+            toggleButton.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
         }
 
         async function handleLogin(event) {

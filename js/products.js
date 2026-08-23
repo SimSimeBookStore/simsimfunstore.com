@@ -1,4 +1,4 @@
-// js/products.js - Central database for your SimSim eBook Store
+// js/products.js - Central database for your SimSim Fun Store
 const SIMSIM_PRODUCTS = [
     {
         id: "prod-1",
