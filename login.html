@@ -139,7 +139,7 @@
             const { error } = await window.supabaseClient.auth.signUp({
                 email: emailInput,
                 password: passwordInput,
-                options: { emailRedirectTo: `${window.location.origin}/login.html` }
+                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
             });
             if (error) {
                 alert(formatAuthError(error));
@@ -158,7 +158,7 @@
             const { error } = await window.supabaseClient.auth.resend({
                 type: "signup",
                 email,
-                options: { emailRedirectTo: `${window.location.origin}/login.html` }
+                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
             });
             if (error) {
                 alert(formatAuthError(error));
