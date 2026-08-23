@@ -46,6 +46,8 @@
         <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/products.js"></script>
     <script src="js/app.js"></script>
     <script>
@@ -135,13 +137,23 @@
             if (!paypalWindow) {
                 document.getElementById("payment-status").innerHTML =
                     "PayPal was blocked by your browser. Allow pop-ups, then " +
-                    "<a href=\"" + paypalUrl + "\" target=\"_blank\" rel=\"noopener\" style=\"color: var(--primary-color); font-weight: bold;\">open PayPal</a>.";
+                    "<a href=\"" + paypalUrl + "\" target=\"_blank\" rel=\"noopener\" style=\"color: var(--primary-color); font-weight: bold;\">open PayPal</a>. " +
+                    "After payment, click <a href=\"success.html\" style=\"color: var(--primary-color); font-weight: bold;\">I completed payment</a>.";
                 return;
             }
 
             document.getElementById("payment-status").innerHTML =
-                "Complete payment in the PayPal tab. This page will return to your library when that tab is closed. " +
-                "<a href=\"success.html\" style=\"color: var(--primary-color); font-weight: bold;\">Complete checkout now</a>.";
+                "Complete payment in the PayPal tab. When finished, click the button below to unlock your items.";
+
+            const completeButton = document.createElement("button");
+            completeButton.type = "button";
+            completeButton.className = "btn";
+            completeButton.style.marginTop = "10px";
+            completeButton.style.background = "#4ECDC4";
+            completeButton.textContent = "I completed payment - Open My Library 📚";
+            completeButton.onclick = completePayPalCheckout;
+            document.getElementById("payment-status").appendChild(document.createElement("br"));
+            document.getElementById("payment-status").appendChild(completeButton);
 
             clearInterval(paypalWindowMonitor);
             paypalWindowMonitor = setInterval(() => {
@@ -150,6 +162,14 @@
                     window.location.href = "success.html";
                 }
             }, 500);
+        }
+
+        function completePayPalCheckout() {
+            if (!localStorage.getItem("simsim_pending_checkout")) {
+                alert("No pending purchase was found. Please start checkout again.");
+                return;
+            }
+            window.location.href = "success.html";
         }
 
         // Run render on page load
