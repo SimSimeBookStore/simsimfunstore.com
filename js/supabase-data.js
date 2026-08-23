@@ -59,3 +59,21 @@ async function migrateLocalLibraryToSupabase(localItems) {
     if (missingItems.length) await savePurchasedItemsToSupabase(missingItems);
     return missingItems.length > 0;
 }
+
+async function migrateAllLocalPurchasesToSupabase(email) {
+    if (!hasSupabaseConnection()) return false;
+
+    const localLibrary = JSON.parse(localStorage.getItem(`simsim_library_${email}`)) || [];
+    const pendingCheckout = JSON.parse(localStorage.getItem("simsim_pending_checkout")) || null;
+    const pendingItems = pendingCheckout && Array.isArray(pendingCheckout.items) &&
+        (!pendingCheckout.user || pendingCheckout.user.toLowerCase() === email.toLowerCase())
+        ? pendingCheckout.items
+        : [];
+    const allItems = [...localLibrary, ...pendingItems].filter((item, index, items) =>
+        item && item.id && items.findIndex(candidate => candidate.id === item.id) === index
+    );
+
+    if (!allItems.length) return false;
+    await migrateLocalLibraryToSupabase(allItems);
+    return true;
+}
