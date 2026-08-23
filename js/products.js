@@ -108,7 +108,7 @@ const SIMSIM_PRODUCTS = [
         type: "coloring-activity",
         category: "Comic Coloring Book",
         ageGroup: "Ages 5-7",
-        price: 1.00,
+        price: 4.00,
         images: [
             "images/Benny Bear.jpg",
             "images/Benny Bear1.jpg",
