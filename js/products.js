@@ -49,7 +49,7 @@ const SIMSIM_PRODUCTS = [
         ],
         description: "Little Jojo the bee lives with her loving family deep inside a giant tree in the forest. One sunny morning, she wakes up, exercises her tiny wings, and flies out wearing her colorful dress to collect sweet flower nectar for breakfast.",
         downloadUrl: "#",
-        videoUrl: "assets/videos/Jojo the little bee En.mp4"
+        videoUrl: "https://canva.link/g7qqngazzrc3cql"
     },
     {
         id: "prod-4",
