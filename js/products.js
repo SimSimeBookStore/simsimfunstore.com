@@ -101,5 +101,22 @@ const SIMSIM_PRODUCTS = [
         description: "Alphabet Valley is bright and colorful again. The Alphabet Crystals sparkle safely inside the museum, and every letter shines across books, signs, songs, and classrooms. Detective Dino smiles proudly as all the animal friends celebrate together with balloons, confetti, and music. Children review the alphabet one last time while everyone cheers. Detective Dino reminds everyone that every letter helps us read, speak, write, and learn new words. The adventure ends with laughter, friendship.",
         downloadUrl: "assets/pdfs/Detective Dino.pdf",
         videoUrl: ""
+    },
+    {
+        id: "prod-7",
+        title: "Benny The Bear",
+        type: "coloring-activity",
+        category: "Comic Coloring Book",
+        ageGroup: "Ages 5-7",
+        price: 1.00,
+        images: [
+            "images/Benny Bear.jpg",
+            "images/Benny Bear1.jpg",
+            "images/Benny Bear2.jpg",
+            "images/Benny Bear3.jpg",
+        ],
+        description: "is a fun-filled comic-style coloring book that helps children ages 5–7 build English skills through exciting stories, colorful adventures, and interactive learning.",
+        downloadUrl: "assets/pdfs/Benny The Bear.pdf",
+        videoUrl: ""
     }
 ];
