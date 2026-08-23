@@ -53,14 +53,22 @@
                 return;
             }
 
-            container.innerHTML = `
-                <h1 style="margin-bottom: 1.5rem;">${video.title}</h1>
-                <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #1a202c; border-radius: 12px; overflow: hidden;">
+            const isLocalVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(videoSource || "");
+            const playerMarkup = isLocalVideo
+                ? `<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #1a202c; border-radius: 12px; overflow: hidden;">
                     <video controls playsinline preload="metadata" title="${video.title}" style="width: 100%; height: 100%; object-fit: contain;">
                         <source src="${videoSource}" type="video/mp4">
                         Your browser does not support video playback.
                     </video>
-                </div>
+                </div>`
+                : `<div style="padding: 2rem; background: #fff8e1; border: 1px solid #f6d365; border-radius: 12px;">
+                    <p style="color: #665200; margin-bottom: 1rem;">This video file has not been uploaded to the website yet.</p>
+                    <a href="${videoSource}" target="_blank" rel="noopener" class="btn">Watch Current Video ▶</a>
+                </div>`;
+
+            container.innerHTML = `
+                <h1 style="margin-bottom: 1.5rem;">${video.title}</h1>
+                ${playerMarkup}
                 <a href="dashboard.html" class="btn" style="margin-top: 1.5rem; background: #4ECDC4;">Back to My Library 📚</a>
             `;
         });

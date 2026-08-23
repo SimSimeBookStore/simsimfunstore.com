@@ -40,8 +40,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             const listContainer = document.getElementById("purchased-items-list");
             const pendingCheckout = JSON.parse(localStorage.getItem("simsim_pending_checkout")) || null;
             const cart = pendingCheckout && Array.isArray(pendingCheckout.items)
@@ -63,6 +64,14 @@
                     }
                 });
                 localStorage.setItem(`simsim_library_${user}`, JSON.stringify(userLibrary));
+                if (hasSupabaseConnection()) {
+                    try {
+                        await savePurchasedItemsToSupabase(cart, new URLSearchParams(window.location.search).get("transaction_id"));
+                    } catch (error) {
+                        console.error("Could not save purchases online.", error);
+                        alert("Your local purchase was saved, but online library sync failed. Please try again later.");
+                    }
+                }
             } else {
                 alert("Notice: You are not logged in. Please log in before checkout so items save to your permanent library!");
             }

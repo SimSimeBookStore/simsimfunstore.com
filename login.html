@@ -50,6 +50,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
     <script src="js/app.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -72,6 +73,28 @@
 
             if (!emailInput || passwordInput.length < 6) {
                 alert("Please enter a valid email address and a password with at least 6 characters.");
+                return;
+            }
+
+            if (hasSupabaseConnection()) {
+                const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
+                    email: emailInput,
+                    password: passwordInput
+                });
+                if (signInError) {
+                    const { error: signUpError } = await window.supabaseClient.auth.signUp({
+                        email: emailInput,
+                        password: passwordInput
+                    });
+                    if (signUpError) {
+                        alert(signUpError.message);
+                        return;
+                    }
+                }
+                localStorage.setItem("simsim_user", emailInput);
+                localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
+                alert(`Welcome back, ${emailInput}! 🎉`);
+                window.location.assign("index.html");
                 return;
             }
 
