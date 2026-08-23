@@ -78,6 +78,9 @@
                     <button id="eraser-button" onclick="toggleEraser()" class="btn" style="padding: 5px 12px;">Eraser ✏️</button>
                     <button id="undo-button" onclick="undoLastStroke()" class="btn" style="padding: 5px 12px;" disabled>Undo ↶</button>
                     <button onclick="clearCanvas()" class="btn" style="background: #e53e3e; padding: 5px 12px; font-size: 0.9rem;">Clear 🧹</button>
+                    <button onclick="changeZoom(-0.25)" class="btn" style="padding: 5px 12px;">Zoom Out −</button>
+                    <strong id="zoom-level">100%</strong>
+                    <button onclick="changeZoom(0.25)" class="btn" style="padding: 5px 12px;">Zoom In +</button>
                 </div>
 
                 <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px;">
@@ -86,9 +89,11 @@
                     <button id="next-page" class="btn" onclick="changePage(1)" style="padding: 7px 12px;">Next →</button>
                 </div>
 
-                <div id="page-stage" style="position: relative; display: inline-block; width: min(100%, 700px); line-height: 0; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px; overflow: hidden;">
-                    <canvas id="pdfCanvas" style="display: block; width: 100%; height: auto;"></canvas>
-                    <canvas id="paintCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
+                <div id="page-stage" style="position: relative; display: inline-block; width: min(100%, 700px); max-height: 75vh; line-height: 0; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px; overflow: auto; text-align: left;">
+                    <div id="zoom-layer" style="position: relative; width: 100%;">
+                        <canvas id="pdfCanvas" style="display: block; width: 100%; height: auto;"></canvas>
+                        <canvas id="paintCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
+                    </div>
                 </div>
             `;
 
@@ -107,6 +112,7 @@
         let strokeContext = null;
         let strokeBase = null;
         let regionMask = null;
+        let zoomLevel = 1;
 
         const paletteColors = ["#EF4444", "#F97316", "#F59E0B", "#EAB308", "#84CC16", "#22C55E", "#14B8A6", "#06B6D4", "#3B82F6", "#6366F1", "#A855F7", "#EC4899", "#92400E", "#F8FAFC", "#1F2937"];
 
@@ -174,6 +180,7 @@
             paintCanvas.width = viewport.width;
             paintCanvas.height = viewport.height;
             await page.render({ canvasContext: pdfCanvas.getContext("2d"), viewport }).promise;
+            applyZoom();
             const savedDrawing = pageDrawings[currentPage];
             const paintContext = paintCanvas.getContext("2d");
             if (savedDrawing) {
@@ -184,6 +191,19 @@
                 paintContext.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             }
             updateUndoButton();
+        }
+
+        function changeZoom(amount) {
+            zoomLevel = Math.max(0.75, Math.min(3, zoomLevel + amount));
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const zoomLayer = document.getElementById("zoom-layer");
+            const zoomLabel = document.getElementById("zoom-level");
+            if (!zoomLayer) return;
+            zoomLayer.style.width = `${zoomLevel * 100}%`;
+            if (zoomLabel) zoomLabel.textContent = `${Math.round(zoomLevel * 100)}%`;
         }
 
         function saveCurrentDrawing() {

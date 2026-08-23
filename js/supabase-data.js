@@ -5,7 +5,7 @@ function hasSupabaseConnection() {
 async function getSupabaseUser() {
     if (!hasSupabaseConnection()) return null;
     const { data, error } = await window.supabaseClient.auth.getUser();
-    if (error) throw error;
+    if (error && error.name !== "AuthSessionMissingError") throw error;
     return data.user;
 }
 

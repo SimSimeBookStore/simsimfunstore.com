@@ -48,7 +48,8 @@
             const cart = pendingCheckout && Array.isArray(pendingCheckout.items)
                 ? pendingCheckout.items
                 : (JSON.parse(localStorage.getItem("simsim_cart")) || []);
-            const user = localStorage.getItem("simsim_user") || (pendingCheckout && pendingCheckout.user);
+            const supabaseUser = hasSupabaseConnection() ? await getSupabaseUser() : null;
+            const user = supabaseUser?.email || localStorage.getItem("simsim_user") || (pendingCheckout && pendingCheckout.user);
 
             if (cart.length === 0) {
                 listContainer.innerHTML = "<p style='text-align: center; color: #666;'>No active cart items found. Check your Library Dashboard to view your purchased content.</p>";
@@ -56,7 +57,7 @@
             }
 
             // Save items permanently to the signed-in account library.
-            if (user) {
+            if (user && (!hasSupabaseConnection() || supabaseUser)) {
                 let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
                 cart.forEach(cartItem => {
                     if (!userLibrary.some(item => item.id === cartItem.id)) {
@@ -64,7 +65,7 @@
                     }
                 });
                 localStorage.setItem(`simsim_library_${user}`, JSON.stringify(userLibrary));
-                if (hasSupabaseConnection()) {
+                if (supabaseUser) {
                     try {
                         await savePurchasedItemsToSupabase(cart, new URLSearchParams(window.location.search).get("transaction_id"));
                     } catch (error) {

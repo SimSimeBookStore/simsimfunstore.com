@@ -69,7 +69,11 @@ function checkUserSessionState() {
     }
 }
 
-function logoutUser() {
+async function logoutUser() {
+    if (window.supabaseClient) {
+        const { error } = await window.supabaseClient.auth.signOut();
+        if (error) console.error("Could not sign out of Supabase.", error);
+    }
     localStorage.removeItem("simsim_user");
     localStorage.removeItem("simsim_remember");
     alert("You have been signed out safely.");
