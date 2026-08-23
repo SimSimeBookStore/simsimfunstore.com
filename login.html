@@ -84,7 +84,10 @@
                 if (signInError) {
                     const { error: signUpError } = await window.supabaseClient.auth.signUp({
                         email: emailInput,
-                        password: passwordInput
+                        password: passwordInput,
+                        options: {
+                            emailRedirectTo: `${window.location.origin}/login.html`
+                        }
                     });
                     if (signUpError) {
                         alert(signUpError.message);
