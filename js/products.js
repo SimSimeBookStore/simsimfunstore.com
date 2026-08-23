@@ -118,5 +118,22 @@ const SIMSIM_PRODUCTS = [
         description: "is a fun-filled comic-style coloring book that helps children ages 5–7 build English skills through exciting stories, colorful adventures, and interactive learning.",
         downloadUrl: "assets/pdfs/Benny The Bear.pdf",
         videoUrl: ""
+    },
+    {
+        id: "prod-8",
+        title: "Happy Farm Animals",
+        type: "coloring-activity",
+        category: "Comic Coloring Book",
+        ageGroup: "Ages 4-8",
+        price: 4.85,
+        images: [
+            "images/Happy Farm.jpg",
+            "images/Happy Farm1.png",
+            "images/Happy Farm2.png",
+            "images/Happy Farm3.png",
+        ],
+        description: "is a fun-filled comic-style coloring book that helps children ages 5–7 build English skills through exciting stories, colorful adventures, and interactive learning.",
+        downloadUrl: "assets/pdfs/Happy Farm Animals.pdf",
+        videoUrl: ""
     }
 ];
