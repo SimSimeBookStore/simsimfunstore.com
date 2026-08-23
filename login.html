@@ -83,7 +83,11 @@
                     password: passwordInput
                 });
                 if (signInError) {
-                    alert(formatAuthError(signInError));
+                    if (signInError.code === "email_not_confirmed") {
+                        showConfirmationMessage(emailInput);
+                    } else {
+                        alert(formatAuthError(signInError));
+                    }
                     return;
                 }
                 localStorage.setItem("simsim_user", emailInput);
@@ -142,6 +146,25 @@
                 return;
             }
             alert("Account created. Check your email once to confirm your account, then sign in.");
+        }
+
+        function showConfirmationMessage(email) {
+            const message = "Your email is not confirmed yet. Check your inbox and spam folder, then click the confirmation link.";
+            const resend = confirm(`${message}\n\nResend the confirmation email?`);
+            if (resend) resendConfirmationEmail(email);
+        }
+
+        async function resendConfirmationEmail(email) {
+            const { error } = await window.supabaseClient.auth.resend({
+                type: "signup",
+                email,
+                options: { emailRedirectTo: `${window.location.origin}/login.html` }
+            });
+            if (error) {
+                alert(formatAuthError(error));
+                return;
+            }
+            alert("A new confirmation email was sent. Please check your inbox and spam folder.");
         }
 
         function formatAuthError(error) {
