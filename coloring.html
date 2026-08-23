@@ -31,11 +31,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
     <script src="js/products.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const user = localStorage.getItem("simsim_user");
+        document.addEventListener("DOMContentLoaded", async () => {
+            let user = localStorage.getItem("simsim_user");
             const gateContainer = document.getElementById("coloring-gate");
+
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                } catch (error) {
+                    console.error("Could not verify the online session.", error);
+                    user = null;
+                }
+            }
 
             if (!user) {
                 gateContainer.innerHTML = `
@@ -46,8 +57,15 @@
                 return;
             }
 
-            // Fetch user's permanent library
-            const userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            if (hasSupabaseConnection()) {
+                try {
+                    const onlineLibrary = await loadLibraryFromSupabase();
+                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
+                } catch (error) {
+                    console.error("Could not load the online coloring library.", error);
+                }
+            }
 
             const coloringBooks = userLibrary.filter(item => item.type === "coloring-activity");
 

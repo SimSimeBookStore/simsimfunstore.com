@@ -29,14 +29,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
     <script src="js/products.js"></script>
     <script src="js/app.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             const container = document.getElementById("video-container");
-            const user = localStorage.getItem("simsim_user");
             const productId = new URLSearchParams(window.location.search).get("id");
-            const library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+            let user = localStorage.getItem("simsim_user");
+            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                    library = user ? await loadLibraryFromSupabase() || [] : [];
+                } catch (error) {
+                    console.error("Could not load the online video library.", error);
+                    user = null;
+                    library = [];
+                }
+            }
             const video = library.find(item => item.id === productId && item.type === "video");
             const catalogVideo = typeof SIMSIM_PRODUCTS !== "undefined"
                 ? SIMSIM_PRODUCTS.find(item => item.id === productId && item.type === "video")
