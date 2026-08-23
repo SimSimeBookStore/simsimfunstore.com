@@ -135,5 +135,22 @@ const SIMSIM_PRODUCTS = [
         description: "Welcome to Sunny Farm, where cheerful animals are getting ready for the biggest Talent Show ever! Join Clara the Cow, Percy the Pig, Holly the Horse, Daisy the Sheep, Rocky the Rooster, and their friends as they discover colors, shapes, numbers, healthy foods, teamwork, and kindness through funny adventures. ",
         downloadUrl: "assets/pdfs/Happy Farm Animals.pdf",
         videoUrl: ""
+    },
+     {
+        id: "prod-9",
+        title: "Super Bear",
+        type: "video",
+        category: "Bedtime Stories-video",
+        ageGroup: "Ages 4-7",
+        price: 5.00,
+        images: [
+            "images/Super/Super .jpg",
+            "images/Super/Super1.jpg",
+            "images/Super/Super2.jpg",
+            "images/Super/Super3.jpg",
+        ],
+        description: "ZeeZo, a cheerful little bear who loves adventures, family, and exploring the forest. One day, he discovers a magical glowing Star Crystal that gives him amazing powers, including flying and super strength. Excited by his new abilities, ZeeZo learns that being a true hero is not about showing off, but about helping others with kindness and responsibility. ",
+        downloadUrl: "#",
+        videoUrl: "https://canva.link/jbboq013w9dliwf"
     }
 ];
