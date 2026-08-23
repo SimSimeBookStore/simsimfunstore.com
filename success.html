@@ -87,7 +87,7 @@
                 } else if (item.type === 'coloring-activity') {
                     actionBtn = `<a href="coloring.html?book=${item.id}" class="btn" style="background: #4ECDC4; padding: 6px 14px; font-size: 0.9rem;">Open Studio 🎨</a>`;
                 } else {
-                    actionBtn = `<a href="${item.downloadUrl}" download class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Download PDF 📥</a>`;
+                    actionBtn = `<a href="reader.html?id=${encodeURIComponent(item.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Read Book 📖</a>`;
                 }
 
                 return `

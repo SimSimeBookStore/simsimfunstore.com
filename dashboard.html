@@ -103,7 +103,7 @@
                 } else if (product.type === 'coloring-activity') {
                     actionButton = `<a href="coloring.html?book=${product.id}" class="btn" style="background: #4ECDC4; text-align: center; display: block; margin-top: auto;">Open in Coloring Studio 🎨</a>`;
                 } else {
-                    actionButton = `<a href="${product.downloadUrl}" download class="btn" style="text-align: center; display: block; margin-top: auto;">Download PDF 📥</a>`;
+                    actionButton = `<a href="reader.html?id=${encodeURIComponent(product.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Read Book 📖</a>`;
                 }
 
                 return `
