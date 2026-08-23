@@ -39,7 +39,7 @@ const SIMSIM_PRODUCTS = [
         title: "Jojo the little bee",
         type: "video",
         category: "Bedtime Stories-video",
-        ageGroup: "Ages 2-5",
+        ageGroup: "Ages 4-7",
         price: 1.00,
         images: [
             "images/Jojo the little bee.jpg",
@@ -73,7 +73,7 @@ const SIMSIM_PRODUCTS = [
         title: "My Comic Coloring Book",
         type: "coloring-activity",
         category: "Comic Coloring Book",
-        ageGroup: "Ages 5-7",
+        ageGroup: "Ages 4-8",
         price: 1.00,
         images: [
             "images/My Comic Coloring Book.jpg",
@@ -107,7 +107,7 @@ const SIMSIM_PRODUCTS = [
         title: "Benny The Bear",
         type: "coloring-activity",
         category: "Comic Coloring Book",
-        ageGroup: "Ages 4-7",
+        ageGroup: "Ages 4-8",
         price: 4.00,
         images: [
             "images/Benny Bear.jpg",
