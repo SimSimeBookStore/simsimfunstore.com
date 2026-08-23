@@ -90,7 +90,7 @@ const SIMSIM_PRODUCTS = [
         title: "Detective Dino",
         type: "coloring-activity",
         category: "Comic Coloring Book",
-        ageGroup: "Ages 5-7",
+        ageGroup: "Ages 5-8",
         price: 1.00,
         images: [
             "images/Detective Dino.jpg",
@@ -107,7 +107,7 @@ const SIMSIM_PRODUCTS = [
         title: "Benny The Bear",
         type: "coloring-activity",
         category: "Comic Coloring Book",
-        ageGroup: "Ages 5-7",
+        ageGroup: "Ages 4-7",
         price: 4.00,
         images: [
             "images/Benny Bear.jpg",
