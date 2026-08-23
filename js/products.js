@@ -6,7 +6,7 @@ const SIMSIM_PRODUCTS = [
         type: "book",
         category: "Bedtime Stories-Book",
         ageGroup: "Ages 3-6",
-        price: 4.99,
+        price: 3.00,
         images: [
             "images/The Time-Travel School Bus.jpg",
             "images/the_city.jpg",
@@ -23,7 +23,7 @@ const SIMSIM_PRODUCTS = [
         type: "coloring-activity",
         category: "Activities-Coloring Book",
         ageGroup: "Ages 5-7",
-        price: 1.00,
+        price: 4.85,
         images: [
             "images/fire_truck.jpg",
             "images/firetruck1.png",
@@ -40,7 +40,7 @@ const SIMSIM_PRODUCTS = [
         type: "video",
         category: "Bedtime Stories-video",
         ageGroup: "Ages 4-7",
-        price: 1.00,
+        price: 5.00,
         images: [
             "images/Jojo the little bee.jpg",
             "images/Jojo the little bee1.jpg",
@@ -57,7 +57,7 @@ const SIMSIM_PRODUCTS = [
         type: "book",
         category: "Bedtime Stories-Book",
         ageGroup: "Ages 4-7",
-        price: 4.99,
+        price: 4.85,
         images: [
             "images/Bobothepanda.jpg",
             "images/Bobothepanda1.jpg",
@@ -74,7 +74,7 @@ const SIMSIM_PRODUCTS = [
         type: "coloring-activity",
         category: "Comic Coloring Book",
         ageGroup: "Ages 4-8",
-        price: 1.00,
+        price: 4.85,
         images: [
             "images/My Comic Coloring Book.jpg",
             "images/My Comic Coloring Book1.png",
@@ -91,7 +91,7 @@ const SIMSIM_PRODUCTS = [
         type: "coloring-activity",
         category: "Comic Coloring Book",
         ageGroup: "Ages 5-8",
-        price: 1.00,
+        price: 4.85,
         images: [
             "images/Detective Dino.jpg",
             "images/Detective Dino1.png",
@@ -108,7 +108,7 @@ const SIMSIM_PRODUCTS = [
         type: "coloring-activity",
         category: "Comic Coloring Book",
         ageGroup: "Ages 4-8",
-        price: 4.00,
+        price: 4.85,
         images: [
             "images/Benny Bear.jpg",
             "images/Benny Bear1.jpg",
