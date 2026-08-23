@@ -45,7 +45,17 @@
     <script src="js/app.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            const user = localStorage.getItem("simsim_user");
+            let user = localStorage.getItem("simsim_user");
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                    if (user) localStorage.setItem("simsim_user", user);
+                } catch (error) {
+                    console.error("Could not verify the online session.", error);
+                    user = null;
+                }
+            }
             if (!user) {
                 alert("Please log in to access your digital library.");
                 window.location.href = "login.html";
