@@ -39,7 +39,8 @@
                     <label for="remember-me" style="font-size: 0.95rem; color: #555; cursor: pointer;">Keep me logged in</label>
                 </div>
 
-                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 1.05rem;">Sign In / Register 🚀</button>
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 1.05rem;">Sign In 🚀</button>
+                <button type="button" class="btn" onclick="registerAccount()" style="width: 100%; padding: 10px; margin-top: 10px; background: #4ECDC4;">Create New Account</button>
             </form>
         </div>
     </main>
@@ -82,17 +83,8 @@
                     password: passwordInput
                 });
                 if (signInError) {
-                    const { error: signUpError } = await window.supabaseClient.auth.signUp({
-                        email: emailInput,
-                        password: passwordInput,
-                        options: {
-                            emailRedirectTo: `${window.location.origin}/login.html`
-                        }
-                    });
-                    if (signUpError) {
-                        alert(signUpError.message);
-                        return;
-                    }
+                    alert(formatAuthError(signInError));
+                    return;
                 }
                 localStorage.setItem("simsim_user", emailInput);
                 localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
@@ -127,6 +119,36 @@
             alert(`Welcome back, ${emailInput}! 🎉`);
 
             window.location.assign("index.html");
+        }
+
+        async function registerAccount() {
+            const emailInput = document.getElementById("login-email").value.trim();
+            const passwordInput = document.getElementById("login-password").value;
+            if (!emailInput || passwordInput.length < 6) {
+                alert("Enter a valid email and a password with at least 6 characters.");
+                return;
+            }
+            if (!hasSupabaseConnection()) {
+                alert("Online account registration is not configured.");
+                return;
+            }
+            const { error } = await window.supabaseClient.auth.signUp({
+                email: emailInput,
+                password: passwordInput,
+                options: { emailRedirectTo: `${window.location.origin}/login.html` }
+            });
+            if (error) {
+                alert(formatAuthError(error));
+                return;
+            }
+            alert("Account created. Check your email once to confirm your account, then sign in.");
+        }
+
+        function formatAuthError(error) {
+            if (error.status === 429 || /rate limit|too many requests/i.test(error.message)) {
+                return "Too many email requests. Please wait a few minutes before trying again. Sign in does not send another email.";
+            }
+            return error.message || "Sign in failed. Check your email and password.";
         }
     </script>
 </body>
