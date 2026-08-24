@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coloring Studio - SimSim eBook Store</title>
+    <title>Coloring Studio - SimSim Fun Store</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
         <nav>
             <a href="index.html">Home</a>
-            <a href="catalog.html">All Books & Videos</a>
             <a href="coloring.html" class="active">🎨 Coloring Studio</a>
             <a href="dashboard.html">My Library 📚</a>
         </nav>
@@ -26,16 +26,28 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
     <script src="js/products.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const user = localStorage.getItem("simsim_user");
+        document.addEventListener("DOMContentLoaded", async () => {
+            let user = localStorage.getItem("simsim_user");
             const gateContainer = document.getElementById("coloring-gate");
+
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                } catch (error) {
+                    console.error("Could not verify the online session.", error);
+                    user = null;
+                }
+            }
 
             if (!user) {
                 gateContainer.innerHTML = `
@@ -46,8 +58,15 @@
                 return;
             }
 
-            // Fetch user's permanent library
-            const userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            if (hasSupabaseConnection()) {
+                try {
+                    const onlineLibrary = await loadLibraryFromSupabase();
+                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
+                } catch (error) {
+                    console.error("Could not load the online coloring library.", error);
+                }
+            }
 
             const coloringBooks = userLibrary.filter(item => item.type === "coloring-activity");
 
@@ -78,6 +97,9 @@
                     <button id="eraser-button" onclick="toggleEraser()" class="btn" style="padding: 5px 12px;">Eraser ✏️</button>
                     <button id="undo-button" onclick="undoLastStroke()" class="btn" style="padding: 5px 12px;" disabled>Undo ↶</button>
                     <button onclick="clearCanvas()" class="btn" style="background: #e53e3e; padding: 5px 12px; font-size: 0.9rem;">Clear 🧹</button>
+                    <button onclick="changeZoom(-0.25)" class="btn" style="padding: 5px 12px;">Zoom Out −</button>
+                    <strong id="zoom-level">100%</strong>
+                    <button onclick="changeZoom(0.25)" class="btn" style="padding: 5px 12px;">Zoom In +</button>
                 </div>
 
                 <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px;">
@@ -86,9 +108,11 @@
                     <button id="next-page" class="btn" onclick="changePage(1)" style="padding: 7px 12px;">Next →</button>
                 </div>
 
-                <div id="page-stage" style="position: relative; display: inline-block; width: min(100%, 700px); line-height: 0; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px; overflow: hidden;">
-                    <canvas id="pdfCanvas" style="display: block; width: 100%; height: auto;"></canvas>
-                    <canvas id="paintCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
+                <div id="page-stage" style="position: relative; display: inline-block; width: min(100%, 700px); max-height: 75vh; line-height: 0; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px; overflow: auto; text-align: left;">
+                    <div id="zoom-layer" style="position: relative; width: 100%;">
+                        <canvas id="pdfCanvas" style="display: block; width: 100%; height: auto;"></canvas>
+                        <canvas id="paintCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
+                    </div>
                 </div>
             `;
 
@@ -107,6 +131,7 @@
         let strokeContext = null;
         let strokeBase = null;
         let regionMask = null;
+        let zoomLevel = 1;
 
         const paletteColors = ["#EF4444", "#F97316", "#F59E0B", "#EAB308", "#84CC16", "#22C55E", "#14B8A6", "#06B6D4", "#3B82F6", "#6366F1", "#A855F7", "#EC4899", "#92400E", "#F8FAFC", "#1F2937"];
 
@@ -174,6 +199,7 @@
             paintCanvas.width = viewport.width;
             paintCanvas.height = viewport.height;
             await page.render({ canvasContext: pdfCanvas.getContext("2d"), viewport }).promise;
+            applyZoom();
             const savedDrawing = pageDrawings[currentPage];
             const paintContext = paintCanvas.getContext("2d");
             if (savedDrawing) {
@@ -184,6 +210,19 @@
                 paintContext.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             }
             updateUndoButton();
+        }
+
+        function changeZoom(amount) {
+            zoomLevel = Math.max(0.75, Math.min(3, zoomLevel + amount));
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const zoomLayer = document.getElementById("zoom-layer");
+            const zoomLabel = document.getElementById("zoom-level");
+            if (!zoomLayer) return;
+            zoomLayer.style.width = `${zoomLevel * 100}%`;
+            if (zoomLabel) zoomLabel.textContent = `${Math.round(zoomLevel * 100)}%`;
         }
 
         function saveCurrentDrawing() {

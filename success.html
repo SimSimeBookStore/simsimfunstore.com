@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - SimSim eBook Store</title>
+    <title>Payment Successful - SimSim Fun Store</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
         <nav>
             <a href="index.html">Home</a>
-            <a href="catalog.html">All Books & Videos</a>
             <a href="dashboard.html">My Library 📚</a>
         </nav>
     </header>
@@ -35,7 +35,8 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -48,7 +49,8 @@
             const cart = pendingCheckout && Array.isArray(pendingCheckout.items)
                 ? pendingCheckout.items
                 : (JSON.parse(localStorage.getItem("simsim_cart")) || []);
-            const user = localStorage.getItem("simsim_user") || (pendingCheckout && pendingCheckout.user);
+            const supabaseUser = hasSupabaseConnection() ? await getSupabaseUser() : null;
+            const user = supabaseUser?.email || localStorage.getItem("simsim_user") || (pendingCheckout && pendingCheckout.user);
 
             if (cart.length === 0) {
                 listContainer.innerHTML = "<p style='text-align: center; color: #666;'>No active cart items found. Check your Library Dashboard to view your purchased content.</p>";
@@ -56,7 +58,7 @@
             }
 
             // Save items permanently to the signed-in account library.
-            if (user) {
+            if (user && (!hasSupabaseConnection() || supabaseUser)) {
                 let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
                 cart.forEach(cartItem => {
                     if (!userLibrary.some(item => item.id === cartItem.id)) {
@@ -64,7 +66,7 @@
                     }
                 });
                 localStorage.setItem(`simsim_library_${user}`, JSON.stringify(userLibrary));
-                if (hasSupabaseConnection()) {
+                if (supabaseUser) {
                     try {
                         await savePurchasedItemsToSupabase(cart, new URLSearchParams(window.location.search).get("transaction_id"));
                     } catch (error) {
@@ -86,7 +88,7 @@
                 } else if (item.type === 'coloring-activity') {
                     actionBtn = `<a href="coloring.html?book=${item.id}" class="btn" style="background: #4ECDC4; padding: 6px 14px; font-size: 0.9rem;">Open Studio 🎨</a>`;
                 } else {
-                    actionBtn = `<a href="${item.downloadUrl}" download class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Download PDF 📥</a>`;
+                    actionBtn = `<a href="reader.html?id=${encodeURIComponent(item.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Read Book 📖</a>`;
                 }
 
                 return `

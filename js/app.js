@@ -6,10 +6,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render featured items on homepage if container exists
     const featuredContainer = document.getElementById("featured-products");
-    if (featuredContainer && typeof SIMSIM_PRODUCTS !== "undefined") {
-        featuredContainer.innerHTML = SIMSIM_PRODUCTS.map(product => {
+    const categoryButtons = document.querySelectorAll(".category-chip");
+    let activeFilter = "all";
+
+    function renderFeaturedProducts(filter = "all") {
+        if (!featuredContainer || typeof SIMSIM_PRODUCTS === "undefined") return;
+
+        const filteredProducts = filter === "all"
+            ? SIMSIM_PRODUCTS
+            : SIMSIM_PRODUCTS.filter(product => product.type === filter);
+
+        featuredContainer.innerHTML = filteredProducts.map(product => {
             const mainImage = (product.images && product.images.length > 0) ? product.images[0] : (product.coverImage || '');
-            
+
             return `
                 <div class="product-card">
                     <img src="${mainImage}" alt="${product.title}">
@@ -27,6 +36,21 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         }).join('');
     }
+
+    categoryButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const selectedFilter = button.dataset.filter;
+            activeFilter = activeFilter === selectedFilter ? "all" : selectedFilter;
+
+            categoryButtons.forEach(item => {
+                item.classList.toggle("active", item.dataset.filter === activeFilter);
+            });
+
+            renderFeaturedProducts(activeFilter);
+        });
+    });
+
+    renderFeaturedProducts(activeFilter);
 });
 
 // Persistent Login Check & Dynamic Navigation State
@@ -69,7 +93,11 @@ function checkUserSessionState() {
     }
 }
 
-function logoutUser() {
+async function logoutUser() {
+    if (window.supabaseClient) {
+        const { error } = await window.supabaseClient.auth.signOut();
+        if (error) console.error("Could not sign out of Supabase.", error);
+    }
     localStorage.removeItem("simsim_user");
     localStorage.removeItem("simsim_remember");
     alert("You have been signed out safely.");

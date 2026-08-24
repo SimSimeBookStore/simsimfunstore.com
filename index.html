@@ -3,16 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimSim eBook Store - Magical Kids Books & Videos</title>
+    <title>SimSim Fun Store - Magical Kids Books & Videos</title>
+    <meta name="description" content="SimSim Fun Store offers magical children's books, comic coloring books, interactive coloring activities, and fun bedtime videos for kids ages 2-8.">
+    <meta name="keywords" content="children's books, kids coloring books, online coloring activities, bedtime stories, kids videos, SimSim Fun Store">
+    <meta name="author" content="SimSim Fun Store">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.simsimfunstore.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SimSim Fun Store - Kids Books, Coloring & Videos">
+    <meta property="og:description" content="Discover magical stories, creative coloring books, and bedtime video tales for children.">
+    <meta property="og:url" content="https://www.simsimfunstore.com/">
+    <meta property="og:site_name" content="SimSim Fun Store">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="SimSim Fun Store - Kids Books, Coloring & Videos">
+    <meta name="twitter:description" content="Magical children's books, coloring activities, and bedtime videos.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "OnlineStore",
+        "name": "SimSim Fun Store",
+        "url": "https://www.simsimfunstore.com/",
+        "description": "Online store for children's books, comic coloring activities, and bedtime videos.",
+        "audience": {
+            "@type": "PeopleAudience",
+            "suggestedMinAge": 2,
+            "suggestedMaxAge": 8
+        }
+    }
+    </script>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
         <nav>
             <a href="index.html" class="active">Home</a>
-            <a href="catalog.html">All Books & Videos</a>
+            <a href="#about-us">About Us</a>
             <!-- Coloring Studio Link (Managed dynamically by app.js) -->
             <span id="nav-coloring-container">
                 <a href="#" onclick="alert('Please log in and purchase a coloring activity book to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Requires Login & Coloring Book">🎨 Coloring Studio (Locked)</a>
@@ -24,19 +52,62 @@
     </header>
 
     <section class="hero">
-        <h1>Welcome to SimSim eBook Store! 🚀</h1>
-        <p>Explore magical comic books, interactive coloring activities, and bedtime video tales.</p>
+        <div class="hero-confetti" aria-hidden="true"><span>✦</span><span>●</span><span>✦</span><span>●</span></div>
+        <div class="hero-toys" aria-hidden="true">
+            <span class="toy-balloon toy-balloon-pink">🎈</span>
+            <span class="toy-balloon toy-balloon-blue">🎈</span>
+            <span class="toy-item toy-bear">🧸</span>
+            <span class="toy-item toy-kite">🪁</span>
+            <span class="toy-item toy-puzzle">🧩</span>
+            <span class="toy-item toy-train">🚂</span>
+            <span class="toy-item toy-bike">🚲</span>
+            <span class="toy-item toy-plane">✈️</span>
+            <span class="toy-item toy-bunny">🐰</span>
+            <span class="toy-item toy-dog">🐶</span>
+            <span class="toy-item toy-cat">🐱</span>
+        </div>
+        <div class="hero-content">
+            <p class="hero-kicker">Stories, colors, and big imaginations</p>
+            <h1>Welcome to SimSim Fun Store! 🚀</h1>
+            <p>Explore magical comic books, interactive coloring activities, and bedtime video tales.</p>
+            <div class="hero-actions">
+                <a href="catalog.html" class="hero-button hero-button-primary">Explore the collection ✨</a>
+                <a href="dashboard.html" class="hero-button hero-button-secondary">Open My Library 📚</a>
+            </div>
+        </div>
     </section>
 
-    <main class="container">
-        <h2 class="section-title">✨ Featured Stories & Videos</h2>
+    <section id="about-us" class="about-section is-hidden">
+        <div class="about-content">
+            <p class="home-kicker">Learning through play</p>
+            <h2>About SimSim Fun Store</h2>
+            <p>Our goal is to help children learn, imagine, and enjoy their free time through colorful stories, creative activities, and playful digital experiences.</p>
+            <p>Every collection is made to encourage curiosity, build early skills, and give families a fun place to read, create, and discover together.</p>
+            <p>Parents can give children joyful screen time that inspires both fun and knowledge. Our stories and activities make learning feel like an adventure, helping children explore new ideas while enjoying every moment.</p>
+            <p>Choose a new favorite today and help your child grow their imagination, creativity, confidence, reading skills, and love of learning through play.</p>
+        </div>
+    </section>
+
+    <main class="container home-products">
+        <div class="home-intro">
+            <div>
+                <p class="home-kicker">Pick your next adventure</p>
+                <h2 class="section-title">✨ Featured Stories & Videos</h2>
+            </div>
+            <div class="category-chips" aria-label="Store categories">
+                <button type="button" class="category-chip chip-coral" data-filter="book">📚 Story books</button>
+                <button type="button" class="category-chip chip-teal" data-filter="coloring-activity">🎨 Coloring fun</button>
+                <button type="button" class="category-chip chip-yellow" data-filter="video">🎬 Video tales</button>
+            </div>
+        </div>
         <div class="product-grid" id="featured-products">
             <!-- Products injected dynamically via app.js -->
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
     </footer>
 
     <!-- Scripts -->
@@ -44,5 +115,29 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/products.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const aboutSection = document.getElementById("about-us");
+            const aboutLink = document.querySelector('a[href="#about-us"]');
+            if (!aboutSection || !aboutLink) return;
+
+            if (window.location.hash === "#about-us") {
+                aboutSection.classList.remove("is-hidden");
+            }
+
+            aboutLink.addEventListener("click", event => {
+                event.preventDefault();
+                aboutSection.classList.remove("is-hidden");
+                aboutSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                history.replaceState(null, "", "#about-us");
+            });
+
+            document.querySelectorAll("header a, .hero a").forEach(link => {
+                if (link !== aboutLink) {
+                    link.addEventListener("click", () => aboutSection.classList.add("is-hidden"));
+                }
+            });
+        });
+    </script>
 </body>
 </html>

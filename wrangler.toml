@@ -1,0 +1,7 @@
+name = "simsimfunstore"
+compatibility_date = "2026-08-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-db-simsimfunstore"
+database_id = "e8c9758e-4f36-4b20-bc32-5f025eae5b74"

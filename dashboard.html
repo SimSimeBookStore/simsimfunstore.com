@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Library Dashboard - SimSim eBook Store</title>
+    <title>My Library Dashboard - SimSim Fun Store</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">🌟 SimSim Store</a>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
         <nav>
             <a href="index.html">Home</a>
-            <a href="catalog.html">All Books & Videos</a>
             <span id="nav-coloring-container">
                 <a href="#" style="color: #A0AEC0; cursor: not-allowed;">🎨 Coloring Studio (Locked)</a>
             </span>
@@ -35,7 +35,8 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 SimSim eBook Store. Safe & Fun for Kids.</p>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -103,7 +104,7 @@
                 } else if (product.type === 'coloring-activity') {
                     actionButton = `<a href="coloring.html?book=${product.id}" class="btn" style="background: #4ECDC4; text-align: center; display: block; margin-top: auto;">Open in Coloring Studio 🎨</a>`;
                 } else {
-                    actionButton = `<a href="${product.downloadUrl}" download class="btn" style="text-align: center; display: block; margin-top: auto;">Download PDF 📥</a>`;
+                    actionButton = `<a href="reader.html?id=${encodeURIComponent(product.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Read Book 📖</a>`;
                 }
 
                 return `
