@@ -1,15 +1,29 @@
 // js/app.js - Handles website interactivity, product rendering, and session state
 
+if (window.location.hostname === "simsimfunstore.com" && window.location.hostname !== "www.simsimfunstore.com" && window.location.hostname !== "localhost") {
+    const redirectUrl = `https://www.simsimfunstore.com${window.location.pathname}${window.location.search}${window.location.hash}`;
+    window.location.replace(redirectUrl);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
     checkUserSessionState();
 
     // Render featured items on homepage if container exists
     const featuredContainer = document.getElementById("featured-products");
-    if (featuredContainer && typeof SIMSIM_PRODUCTS !== "undefined") {
-        featuredContainer.innerHTML = SIMSIM_PRODUCTS.map(product => {
+    const categoryButtons = document.querySelectorAll(".category-chip");
+    let activeFilter = "all";
+
+    function renderFeaturedProducts(filter = "all") {
+        if (!featuredContainer || typeof SIMSIM_PRODUCTS === "undefined") return;
+
+        const filteredProducts = filter === "all"
+            ? SIMSIM_PRODUCTS
+            : SIMSIM_PRODUCTS.filter(product => product.type === filter);
+
+        featuredContainer.innerHTML = filteredProducts.map(product => {
             const mainImage = (product.images && product.images.length > 0) ? product.images[0] : (product.coverImage || '');
-            
+
             return `
                 <div class="product-card">
                     <img src="${mainImage}" alt="${product.title}">
@@ -27,6 +41,21 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         }).join('');
     }
+
+    categoryButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const selectedFilter = button.dataset.filter;
+            activeFilter = activeFilter === selectedFilter ? "all" : selectedFilter;
+
+            categoryButtons.forEach(item => {
+                item.classList.toggle("active", item.dataset.filter === activeFilter);
+            });
+
+            renderFeaturedProducts(activeFilter);
+        });
+    });
+
+    renderFeaturedProducts(activeFilter);
 });
 
 // Persistent Login Check & Dynamic Navigation State

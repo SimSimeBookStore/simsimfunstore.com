@@ -741,12 +741,46 @@ footer {
 }
 
 .category-chip {
+    border: none;
     border-radius: 999px;
     padding: 0.45rem 0.75rem;
     color: #27303f;
     font-size: 0.85rem;
     font-weight: bold;
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, color 0.2s ease, filter 0.2s ease;
+}
+
+.category-chip:hover,
+.category-chip:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.95);
+    filter: brightness(1.08);
+}
+
+.category-chip.chip-coral:hover,
+.category-chip.chip-coral:focus-visible {
+    color: #7b1e5a;
+    background: #ffd1f2;
+}
+
+.category-chip.chip-teal:hover,
+.category-chip.chip-teal:focus-visible {
+    color: #0d5d5a;
+    background: #bdfcf8;
+}
+
+.category-chip.chip-yellow:hover,
+.category-chip.chip-yellow:focus-visible {
+    color: #7a6200;
+    background: #fff9a6;
+}
+
+.category-chip.active {
+    outline: 3px solid rgba(39, 48, 63, 0.3);
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
 .chip-coral { background: #ff9bea; }
