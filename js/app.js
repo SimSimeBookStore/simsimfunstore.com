@@ -1,5 +1,10 @@
 // js/app.js - Handles website interactivity, product rendering, and session state
 
+if (window.location.hostname === "simsimfunstore.com" && window.location.hostname !== "www.simsimfunstore.com" && window.location.hostname !== "localhost") {
+    const redirectUrl = `https://www.simsimfunstore.com${window.location.pathname}${window.location.search}${window.location.hash}`;
+    window.location.replace(redirectUrl);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
     checkUserSessionState();
