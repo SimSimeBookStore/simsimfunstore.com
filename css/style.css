@@ -24,8 +24,8 @@ body {
 }
 
 header {
-    background: white;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    background: linear-gradient(100deg, #ffd1f2 0%, #bdfcf8 45%, #fff9a6 100%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     position: sticky;
     top: 0;
     z-index: 100;
