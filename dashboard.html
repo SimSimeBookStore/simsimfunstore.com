@@ -97,23 +97,31 @@
 
             // Render unlocked user items with specific buttons for videos, coloring studio, or PDF downloads
             libraryContainer.innerHTML = userLibrary.map(product => {
+                const catalogProduct = typeof SIMSIM_PRODUCTS !== "undefined"
+                    ? SIMSIM_PRODUCTS.find(item => item.id === product.id)
+                    : null;
+                const displayProduct = catalogProduct
+                    ? { ...catalogProduct, ...product, images: product.images?.length ? product.images : catalogProduct.images }
+                    : product;
                 let actionButton = '';
 
-                if (product.type === 'video') {
-                    actionButton = `<a href="video-player.html?id=${encodeURIComponent(product.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Watch Video ▶</a>`;
-                } else if (product.type === 'coloring-activity') {
-                    actionButton = `<a href="coloring.html?book=${product.id}" class="btn" style="background: #4ECDC4; text-align: center; display: block; margin-top: auto;">Open in Coloring Studio 🎨</a>`;
+                if (displayProduct.type === 'puzzle-game') {
+                    actionButton = `<a href="${displayProduct.downloadUrl}" class="btn" style="background: #FF6B6B; text-align: center; display: block; margin-top: auto;">Play Game 🧩</a>`;
+                } else if (displayProduct.type === 'video') {
+                    actionButton = `<a href="video-player.html?id=${encodeURIComponent(displayProduct.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Watch Video ▶</a>`;
+                } else if (displayProduct.type === 'coloring-activity') {
+                    actionButton = `<a href="coloring.html?book=${displayProduct.id}" class="btn" style="background: #4ECDC4; text-align: center; display: block; margin-top: auto;">Open in Coloring Studio 🎨</a>`;
                 } else {
-                    actionButton = `<a href="reader.html?id=${encodeURIComponent(product.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Read Book 📖</a>`;
+                    actionButton = `<a href="reader.html?id=${encodeURIComponent(displayProduct.id)}" class="btn" style="text-align: center; display: block; margin-top: auto;">Read Book 📖</a>`;
                 }
 
                 return `
                     <div class="product-card">
-                        <img src="${product.coverImage || (product.images && product.images[0])}" alt="${product.title}">
+                        <img src="${displayProduct.coverImage || (displayProduct.images && displayProduct.images[0])}" alt="${displayProduct.title}">
                         <div class="product-info">
                             <span class="badge">Unlocked 🔓</span>
-                            <h3>${product.title}</h3>
-                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">${product.ageGroup}</p>
+                            <h3>${displayProduct.title}</h3>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">${displayProduct.ageGroup}</p>
                             ${actionButton}
                         </div>
                     </div>

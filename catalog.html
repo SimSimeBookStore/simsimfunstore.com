@@ -61,10 +61,11 @@
                                 <span class="badge">${product.category}</span>
                                 <h3>${product.title}</h3>
                                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${product.ageGroup}</p>
-                                <div class="price">$${product.price.toFixed(2)}</div>
+                                <div class="price">${product.type === "puzzle" ? "Free to play" : `$${product.price.toFixed(2)}`}</div>
                                 <div style="display: flex; gap: 8px; margin-top: auto;">
-                                    <a href="product-detail.html?id=${product.id}" class="btn" style="background: #4ECDC4; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">View 🔍</a>
-                                    <button class="btn" onclick="addToCart('${product.id}')" style="flex: 1; font-size: 0.9rem;">Buy 🛒</button>
+                                    ${product.type === "puzzle"
+                                        ? `<a href="/puzzle-game?id=${product.id}" class="btn" style="background: #FF6B6B; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">Play 🧩</a>`
+                                        : `<a href="product-detail.html?id=${product.id}" class="btn" style="background: #4ECDC4; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">View 🔍</a><button class="btn" onclick="addToCart('${product.id}')" style="flex: 1; font-size: 0.9rem;">Buy 🛒</button>`}
                                 </div>
                             </div>
                         </div>

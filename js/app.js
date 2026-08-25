@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render featured items on homepage if container exists
     const featuredContainer = document.getElementById("featured-products");
-    const categoryButtons = document.querySelectorAll(".category-chip");
+    const categoryButtons = document.querySelectorAll(".category-chip[data-filter]");
     let activeFilter = "all";
 
     function renderFeaturedProducts(filter = "all") {
@@ -31,10 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         <span class="badge">${product.category}</span>
                         <h3>${product.title}</h3>
                         <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${product.ageGroup}</p>
-                        <div class="price">$${product.price.toFixed(2)}</div>
+                        <div class="price">${product.type === "puzzle" ? "Free to play" : `$${product.price.toFixed(2)}`}</div>
                         <div style="display: flex; gap: 8px; margin-top: auto;">
-                            <a href="product-detail.html?id=${product.id}" class="btn" style="background: #4ECDC4; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">View 🔍</a>
-                            <button class="btn" onclick="addToCart('${product.id}')" style="flex: 1; font-size: 0.9rem;">Buy 🛒</button>
+                            ${product.type === "puzzle"
+                                ? `<a href="/puzzle-game?id=${product.id}" class="btn" style="background: #FF6B6B; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">Play 🧩</a>`
+                                : `<a href="product-detail.html?id=${product.id}" class="btn" style="background: #4ECDC4; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">View 🔍</a><button class="btn" onclick="addToCart('${product.id}')" style="flex: 1; font-size: 0.9rem;">Buy 🛒</button>`}
                         </div>
                     </div>
                 </div>
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     categoryButtons.forEach(button => {
         button.addEventListener("click", () => {
+            if (button.dataset.filter === "puzzle") return;
             const selectedFilter = button.dataset.filter;
             activeFilter = activeFilter === selectedFilter ? "all" : selectedFilter;
 
@@ -117,7 +119,10 @@ function getCart() {
 function addToCart(productId) {
     if (!localStorage.getItem("simsim_user")) {
         alert("Please sign in before buying an item.");
-        window.location.href = "login.html";
+        const loginPath = window.location.protocol === "file:"
+            ? (window.location.pathname.includes("/puzzle-game/") ? "../login.html" : "login.html")
+            : "/login.html";
+        window.location.href = loginPath;
         return;
     }
 

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Count the Animals - Kids Counting Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Audio Toggle & Top Bar -->
+        <header class="game-header">
+            <a href="../../index.html" class="exit-btn" aria-label="Exit to main page">Exit</a>
+            <button id="sound-toggle" aria-label="Toggle Sound" title="Sound On/Off">🔊</button>
+        </header>
+
+        <!-- SCREEN 1: START SCREEN (Animal Selection) -->
+        <section id="screen-start" class="screen active">
+            <div class="title-container">
+                <h1 aria-label="Count the Animals!"><span>C</span><span>o</span><span>u</span><span>n</span><span>t</span> <span>t</span><span>h</span><span>e</span> <span>A</span><span>n</span><span>i</span><span>m</span><span>a</span><span>l</span><span>s</span><span>!</span></h1>
+                <p class="subtitle">Choose your animal and start counting!</p>
+            </div>
+
+            <div class="toy-decor" aria-hidden="true">
+                <span class="toy-item toy-1">🧸</span>
+                <span class="toy-item toy-2">🎲</span>
+                <span class="toy-item toy-3">🚂</span>
+                <span class="toy-item toy-4">🧩</span>
+                <span class="toy-item toy-5">🎈</span>
+            </div>
+            
+            <div class="animal-cards">
+                <div class="animal-card" data-animal="bunny">
+                    <img src="images/bunny.png" alt="Bunny" onerror="this.src='https://api.iconify.design/twemoji:rabbit.svg'">
+                    <button class="btn choose-btn">Choose Bunny</button>
+                </div>
+                <div class="animal-card" data-animal="bear">
+                    <img src="images/bunny-bear.png" alt="Bear" onerror="this.src='https://api.iconify.design/twemoji:bear.svg'">
+                    <button class="btn choose-btn">Choose Bear</button>
+                </div>
+                <div class="animal-card" data-animal="fox">
+                    <img src="images/fox.png" alt="Fox" onerror="this.src='https://api.iconify.design/twemoji:fox.svg'">
+                    <button class="btn choose-btn">Choose Fox</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: MODE SELECTION -->
+        <section id="screen-mode" class="screen">
+            <div class="title-container">
+                <h2>Choose Your Game</h2>
+                <p class="subtitle">How would you like to play?</p>
+            </div>
+            <div class="mode-buttons">
+                <button id="mode-sequential" class="btn mode-btn">🔢 Count 1–10</button>
+                <button id="mode-random" class="btn mode-btn">🎲 Random Numbers</button>
+            </div>
+            <button class="btn secondary-btn" id="back-to-animals">🐾 Change Animal</button>
+        </section>
+
+        <!-- SCREEN 3: GAMEPLAY SCREEN -->
+        <section id="screen-game" class="screen">
+            <div class="game-top-bar">
+                <button class="btn small-btn" id="btn-change-animal">🐾 Change Animal</button>
+                <div id="progress-container">
+                    <span id="progress-text">Number 1 of 10</span>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-fill" style="width: 10%;"></div>
+                    </div>
+                </div>
+                <button class="btn small-btn" id="btn-restart">↻ Start Over</button>
+            </div>
+
+            <div class="game-main-layout">
+                <!-- Left/Top: Target Area & Number -->
+                <div class="target-section">
+                    <h3>Count the Animals!</h3>
+                    <div class="target-display">
+                        <span class="instruction-label">How many?</span>
+                        <div id="target-number">5</div>
+                        <div id="counter-status">Animals: <span id="current-count">0</span> / <span id="target-max">5</span></div>
+                        <div id="counting-sequence" class="counting-sequence">Count 1, 2, 3...</div>
+                    </div>
+
+                    <div id="drop-target-area" class="drop-zone" aria-label="Drop animals here">
+                        <div class="drop-placeholder">
+                            <span>DRAG AND DROP ANIMALS HERE</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons-row">
+                        <button class="btn secondary-btn" id="btn-remove-last">↩ Remove Last</button>
+                    </div>
+                </div>
+
+                <!-- Right/Bottom: Available Animal Pool -->
+                <div class="pool-section">
+                    <h4>Drag and Drop an Animal</h4>
+                    <div id="animal-pool" class="animal-pool">
+                        <!-- Draggable animals populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: COMPLETION SCREEN -->
+        <section id="screen-complete" class="screen">
+            <div class="completion-card">
+                <h2>🎉 Amazing! 🎉</h2>
+                <p class="subtitle">You counted all the way from 1 to 10!</p>
+                <div class="champion-badge">⭐ Counting Champion! ⭐</div>
+                <div class="completion-buttons">
+                    <button class="btn" id="btn-play-again">Play Again</button>
+                    <button class="btn secondary-btn" id="btn-choose-other">Choose Another Animal</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Modal / Overlay -->
+    <div id="success-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="success-title">🎉 Great Job! 🎉</h2>
+            <p id="success-message">You counted correctly!</p>
+            <button class="btn" id="btn-next-number">Next Number →</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

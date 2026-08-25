@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collect the Image - Puzzle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="title-block">
+                <h1 class="rainbow-title" aria-label="Collect The Image">
+                    <span>🧩</span>
+                    <span>C</span><span>o</span><span>l</span><span>l</span><span>e</span><span>c</span><span>t</span>
+                    <span class="title-space"> </span>
+                    <span>T</span><span>h</span><span>e</span>
+                    <span class="title-space"> </span>
+                    <span>I</span><span>m</span><span>a</span><span>g</span><span>e</span><span>!</span>
+                </h1>
+                <p id="instructionText" class="rainbow-subtitle">Choose a picture to start solving your puzzle!</p>
+            </div>
+            <a href="../../index.html" class="exit-btn" aria-label="Exit to main page">Exit</a>
+        </header>
+
+        <!-- STAGE 1: IMAGE SELECTION GALLERY (5 Images) -->
+        <div id="galleryScreen" class="gallery-screen">
+            <h2 class="gallery-3d-title" aria-label="Pick An Image">
+                <span>P</span><span>i</span><span>c</span><span>k</span>
+                <span> </span>
+                <span>A</span><span>n</span>
+                <span> </span>
+                <span>I</span><span>m</span><span>a</span><span>g</span><span>e</span><span>:</span>
+            </h2>
+            <div class="image-grid" id="imageGrid">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- STAGE 2: ACTIVE PUZZLE BOARD (Hidden until an image is chosen) -->
+        <div id="gameScreen" class="game-screen hidden">
+            <div class="game-layout">
+                <div class="puzzle-board" id="puzzleBoard"></div>
+                <div class="reference-panel">
+                    <h3>Reference Image</h3>
+                    <img id="referenceImage" class="reference-image" alt="Puzzle reference preview">
+                </div>
+                <div class="pieces-tray" id="piecesTray"></div>
+            </div>
+
+            <div class="score-footer">
+                <button id="stopButton" class="control-btn stop-btn">🛑 Stop / Choose Another</button>
+                <span id="progressText">Placed: 0 / 100</span>
+                <a href="../../index.html" class="hub-link">🏠 Main Hub</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="yesAudio" src="assets/yes.mp3" preload="auto"></audio>
+    <audio id="noAudio" src="assets/no.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

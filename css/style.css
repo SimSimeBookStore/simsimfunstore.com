@@ -786,6 +786,118 @@ footer {
 .chip-coral { background: #ff9bea; }
 .chip-teal { background: var(--neon-cyan); }
 .chip-yellow { background: #fff13b; }
+.chip-puzzle { background: #ffb86c; }
+
+.hero-button-puzzle {
+    background: #172033;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(23, 32, 51, 0.2);
+}
+
+.puzzle-shell {
+    max-width: 900px;
+    margin-top: 2.5rem;
+    margin-bottom: 5rem;
+}
+
+.puzzle-heading {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.puzzle-heading h1 {
+    margin-bottom: 0.45rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.puzzle-heading p {
+    color: #4a5568;
+}
+
+.puzzle-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.puzzle-picker {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.puzzle-picker button {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    background: #ffffff;
+    color: var(--dark-text);
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.puzzle-picker button.active,
+.puzzle-picker button:hover {
+    border-color: var(--primary-color);
+}
+
+.puzzle-stats {
+    color: #4a5568;
+    font-weight: bold;
+}
+
+.puzzle-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: min(86vw, 600px);
+    aspect-ratio: 1;
+    margin: 0 auto 1.5rem;
+    gap: 4px;
+    padding: 4px;
+    border: 4px solid #172033;
+    border-radius: 14px;
+    background: #172033;
+    box-shadow: 0 12px 24px rgba(23, 32, 51, 0.2);
+}
+
+.puzzle-tile {
+    min-width: 0;
+    border: 0;
+    border-radius: 5px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.puzzle-tile:hover,
+.puzzle-tile:focus-visible {
+    filter: brightness(1.12);
+    transform: scale(0.98);
+    outline: 3px solid var(--accent-yellow);
+}
+
+.puzzle-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.puzzle-reset-button {
+    background: #4ECDC4;
+}
+
+.puzzle-message {
+    min-height: 1.6rem;
+    margin-top: 1rem;
+    color: #b83b4a;
+    font-weight: bold;
+    text-align: center;
+}
 
 @media (max-width: 700px) {
     .hero {

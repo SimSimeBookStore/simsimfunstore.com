@@ -152,5 +152,77 @@ const SIMSIM_PRODUCTS = [
         description: "ZeeZo, a cheerful little bear who loves adventures, family, and exploring the forest. One day, he discovers a magical glowing Star Crystal that gives him amazing powers, including flying and super strength. Excited by his new abilities, ZeeZo learns that being a true hero is not about showing off, but about helping others with kindness and responsibility. ",
         downloadUrl: "#",
         videoUrl: "https://canva.link/jbboq013w9dliwf"
+    },
+    {
+        id: "puzzle-time-bus",
+        title: "Time-Travel Bus Puzzle",
+        type: "puzzle",
+        category: "Puzzle Game",
+        ageGroup: "Ages 3-8",
+        price: 0,
+        images: ["images/time/The Time-Travel School Bus.jpg"],
+        description: "Put the magical school bus back together and get ready for the next adventure.",
+        downloadUrl: "#",
+        videoUrl: ""
+    },
+    {
+        id: "puzzle-super-bear",
+        title: "Super Bear Puzzle",
+        type: "puzzle",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 0,
+        images: ["images/Super/Super .jpg"],
+        description: "Solve the Super Bear picture puzzle and help ZeeZo get ready to fly.",
+        downloadUrl: "#",
+        videoUrl: ""
+    },
+    {
+        id: "puzzle-happy-farm",
+        title: "Happy Farm Puzzle",
+        type: "puzzle",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 0,
+        images: ["images/farm/Happy Farm.jpg"],
+        description: "Join the farm friends by assembling their colorful picture.",
+        downloadUrl: "#",
+        videoUrl: ""
+    },
+    {
+        id: "game-find-the-animal",
+        title: "Find the Animal",
+        type: "puzzle-game",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 3.00,
+        images: ["puzzle-game/games/find-the-animal/assets/mainpuzzle.png"],
+        description: "Match all 25 animals to their correct spots.",
+        downloadUrl: "puzzle-game/games/find-the-animal/index.html",
+        videoUrl: ""
+    },
+    {
+        id: "game-collect-the-image",
+        title: "Collect the Image",
+        type: "puzzle-game",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 3.00,
+        images: ["puzzle-game/games/collect-the-image/assets/front.png"],
+        description: "Drag and arrange pieces to complete the full picture.",
+        downloadUrl: "puzzle-game/games/collect-the-image/index.html",
+        videoUrl: ""
+    },
+    {
+        id: "game-count-the-animals",
+        title: "Count the Animals",
+        type: "puzzle-game",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 3.50,
+        images: ["puzzle-game/games/counting-game/images/count the animals.png"],
+        description: "Choose an animal and count the correct number of friends.",
+        downloadUrl: "puzzle-game/games/counting-game/index.html",
+        videoUrl: ""
     }
 ];

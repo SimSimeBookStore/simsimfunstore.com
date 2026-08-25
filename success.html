@@ -42,6 +42,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-data.js"></script>
+    <script src="js/products.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             const listContainer = document.getElementById("purchased-items-list");
@@ -80,15 +81,23 @@
 
             // Render purchased items with proper preview images and buttons[cite: 3]
             listContainer.innerHTML = `<h3>Your Unlocked Items:</h3>` + cart.map(item => {
-                const coverImage = item.coverImage || (item.images && item.images.length > 0 ? item.images[0] : '');
+                const catalogProduct = typeof SIMSIM_PRODUCTS !== "undefined"
+                    ? SIMSIM_PRODUCTS.find(product => product.id === item.id)
+                    : null;
+                const displayItem = catalogProduct
+                    ? { ...catalogProduct, ...item, images: item.images?.length ? item.images : catalogProduct.images }
+                    : item;
+                const coverImage = displayItem.coverImage || (displayItem.images && displayItem.images.length > 0 ? displayItem.images[0] : '');
                 let actionBtn = '';
 
-                if (item.type === 'video') {
-                    actionBtn = `<a href="video-player.html?id=${encodeURIComponent(item.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Watch Video ▶</a>`;
-                } else if (item.type === 'coloring-activity') {
-                    actionBtn = `<a href="coloring.html?book=${item.id}" class="btn" style="background: #4ECDC4; padding: 6px 14px; font-size: 0.9rem;">Open Studio 🎨</a>`;
+                if (displayItem.type === 'puzzle-game') {
+                    actionBtn = `<a href="${displayItem.downloadUrl}" class="btn" style="background: #FF6B6B; padding: 6px 14px; font-size: 0.9rem;">Play Game 🧩</a>`;
+                } else if (displayItem.type === 'video') {
+                    actionBtn = `<a href="video-player.html?id=${encodeURIComponent(displayItem.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Watch Video ▶</a>`;
+                } else if (displayItem.type === 'coloring-activity') {
+                    actionBtn = `<a href="coloring.html?book=${displayItem.id}" class="btn" style="background: #4ECDC4; padding: 6px 14px; font-size: 0.9rem;">Open Studio 🎨</a>`;
                 } else {
-                    actionBtn = `<a href="reader.html?id=${encodeURIComponent(item.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Read Book 📖</a>`;
+                    actionBtn = `<a href="reader.html?id=${encodeURIComponent(displayItem.id)}" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">Read Book 📖</a>`;
                 }
 
                 return `
@@ -96,8 +105,8 @@
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="${coverImage}" alt="${item.title}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
                             <div>
-                                <strong>${item.title}</strong>
-                                <div style="font-size: 0.85rem; color: #666;">${item.category}</div>
+                                <strong>${displayItem.title}</strong>
+                                <div style="font-size: 0.85rem; color: #666;">${displayItem.category}</div>
                             </div>
                         </div>
                         <div>${actionBtn}</div>
