@@ -54,14 +54,7 @@
             const catalogVideo = typeof SIMSIM_PRODUCTS !== "undefined"
                 ? SIMSIM_PRODUCTS.find(item => item.id === productId && item.type === "video")
                 : null;
-            const resolvedTitle = (catalogVideo?.title || video?.title || "").toLowerCase();
-            const isJojoVideo = productId === "prod-3" || resolvedTitle.includes("jojo");
-            const localVideoOverrides = {
-                "prod-3": "assets/videos/jojo bee.mp4"
-            };
-            const videoSource = isJojoVideo
-                ? "assets/videos/jojo bee.mp4"
-                : (localVideoOverrides[productId] || catalogVideo?.videoUrl || video?.videoUrl);
+            const videoSource = (catalogVideo?.videoUrl || video?.videoUrl || "").trim();
 
             if (!user) {
                 container.innerHTML = '<h2>🔒 Sign In Required</h2><p style="margin: 15px 0; color: #666;">Please sign in to watch your purchased video.</p><a href="login.html" class="btn">Sign In 🔐</a>';
@@ -73,8 +66,14 @@
                 return;
             }
 
+            if (!videoSource) {
+                container.innerHTML = '<h2>Video Not Available</h2><p style="margin: 15px 0; color: #666;">No video source is configured for this title yet.</p><a href="dashboard.html" class="btn">Back to My Library 📚</a>';
+                return;
+            }
+
             const isLocalVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(videoSource || "");
             const localVideoSource = isLocalVideo ? encodeURI(videoSource) : "";
+            const isCanvaLink = /(^https?:\/\/)?(www\.)?canva\.link\//i.test(videoSource);
             const playerMarkup = isLocalVideo
                 ? `<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #1a202c; border-radius: 12px; overflow: hidden;">
                     <video controls playsinline preload="metadata" title="${video.title}" style="width: 100%; height: 100%; object-fit: contain;">
@@ -82,6 +81,12 @@
                         Your browser does not support video playback.
                     </video>
                 </div>`
+                : isCanvaLink
+                ? `<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                    <iframe src="${videoSource}" title="${video.title}" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                </div>
+                <p style="margin-top: 1rem; color: #666;">If the video does not load in the frame, open it directly.</p>
+                <a href="${videoSource}" target="_blank" rel="noopener" class="btn">Open Video in New Tab ▶</a>`
                 : `<div style="padding: 2rem; background: #fff8e1; border: 1px solid #f6d365; border-radius: 12px;">
                     <p style="color: #665200; margin-bottom: 1rem;">This video file has not been uploaded to the website yet.</p>
                     <a href="${videoSource}" target="_blank" rel="noopener" class="btn">Watch Current Video ▶</a>
