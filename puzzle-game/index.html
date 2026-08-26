@@ -122,12 +122,26 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-data.js"></script>
     <script src="../js/products.js"></script>
     <script src="../js/app.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const user = localStorage.getItem("simsim_user");
-            const library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+        document.addEventListener("DOMContentLoaded", async () => {
+            let user = localStorage.getItem("simsim_user");
+            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser?.email || user;
+                    const onlineLibrary = supabaseUser ? await loadLibraryFromSupabase() : null;
+                    if (onlineLibrary) library = onlineLibrary;
+                } catch (error) {
+                    console.error("Could not load the online puzzle library.", error);
+                }
+            }
 
             document.querySelectorAll(".buy-button[data-product-id]").forEach(button => {
                 if (!library.some(item => item.id === button.dataset.productId)) return;
