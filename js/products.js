@@ -224,5 +224,22 @@ const SIMSIM_PRODUCTS = [
         description: "Choose an animal and count the correct number of friends.",
         downloadUrl: "puzzle-game/games/counting-game/index.html",
         videoUrl: ""
-    }
+    },
+    {
+        id: "prod-10",
+        title: "Masooka Wonderful Day",
+        type: "video",
+        category: "Bedtime Stories-video",
+        ageGroup: "Ages 4-7",
+        price: 5.00,
+        images: [
+            "images/mesoka/mesoka.jpg",
+            "images/mesoka/mesoka1.jpg",
+            "images/mesoka/mesoka2.jpg",
+            "images/mesoka/mesoka3.jpg",
+        ],
+        description: "Masooka, a cheerful 8-year-old girl with a beautiful smile, and her caring older brother Asser on a fun and heartwarming school day adventure.  Masooka learns the importance of kindness, teamwork, learning, and family love",
+        downloadUrl: "#",
+        videoUrl: "assets/videos/mesoka.mp4"
+    },
 ];
