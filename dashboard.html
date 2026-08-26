@@ -103,6 +103,10 @@
                 const displayProduct = catalogProduct
                     ? { ...catalogProduct, ...product, images: product.images?.length ? product.images : catalogProduct.images }
                     : product;
+                const imageSource = catalogProduct?.images?.[0]
+                    || displayProduct.coverImage
+                    || displayProduct.images?.[0]
+                    || "images/icon2.png";
                 let actionButton = '';
 
                 if (displayProduct.type === 'puzzle-game') {
@@ -117,7 +121,7 @@
 
                 return `
                     <div class="product-card">
-                        <img src="${displayProduct.coverImage || (displayProduct.images && displayProduct.images[0])}" alt="${displayProduct.title}">
+                        <img src="${imageSource}" alt="${displayProduct.title}">
                         <div class="product-info">
                             <span class="badge">Unlocked 🔓</span>
                             <h3>${displayProduct.title}</h3>

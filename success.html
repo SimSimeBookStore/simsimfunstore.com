@@ -87,7 +87,10 @@
                 const displayItem = catalogProduct
                     ? { ...catalogProduct, ...item, images: item.images?.length ? item.images : catalogProduct.images }
                     : item;
-                const coverImage = displayItem.coverImage || (displayItem.images && displayItem.images.length > 0 ? displayItem.images[0] : '');
+                const coverImage = catalogProduct?.images?.[0]
+                    || displayItem.coverImage
+                    || displayItem.images?.[0]
+                    || "images/icon2.png";
                 let actionBtn = '';
 
                 if (displayItem.type === 'puzzle-game') {
