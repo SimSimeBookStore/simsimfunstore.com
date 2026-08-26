@@ -54,10 +54,14 @@
             const catalogVideo = typeof SIMSIM_PRODUCTS !== "undefined"
                 ? SIMSIM_PRODUCTS.find(item => item.id === productId && item.type === "video")
                 : null;
+            const resolvedTitle = (catalogVideo?.title || video?.title || "").toLowerCase();
+            const isJojoVideo = productId === "prod-3" || resolvedTitle.includes("jojo");
             const localVideoOverrides = {
                 "prod-3": "assets/videos/jojo bee.mp4"
             };
-            const videoSource = localVideoOverrides[productId] || catalogVideo?.videoUrl || video?.videoUrl;
+            const videoSource = isJojoVideo
+                ? "assets/videos/jojo bee.mp4"
+                : (localVideoOverrides[productId] || catalogVideo?.videoUrl || video?.videoUrl);
 
             if (!user) {
                 container.innerHTML = '<h2>🔒 Sign In Required</h2><p style="margin: 15px 0; color: #666;">Please sign in to watch your purchased video.</p><a href="login.html" class="btn">Sign In 🔐</a>';
