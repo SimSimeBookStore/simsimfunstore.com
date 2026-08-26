@@ -148,3 +148,56 @@ function updateCartCount() {
         countEl.textContent = cart.length;
     }
 }
+
+// Opens the OS native share sheet (WhatsApp, SMS, Instagram, Snapchat, etc.) or a fallback menu
+function shareWebsite() {
+    const shareData = {
+        title: "SimSim Fun Store",
+        text: "Check out SimSim Fun Store — magical kids books, videos & puzzles!",
+        url: `${window.location.origin}/`
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+        return;
+    }
+    openShareMenu(shareData);
+}
+
+function openShareMenu(shareData) {
+    let menu = document.getElementById("share-menu");
+    if (!menu) {
+        const shareText = encodeURIComponent(`${shareData.text} ${shareData.url}`);
+        menu = document.createElement("div");
+        menu.id = "share-menu";
+        menu.className = "share-menu";
+        menu.hidden = true;
+        menu.innerHTML = `
+            <div class="share-menu-box">
+                <h3>Share SimSim Fun Store</h3>
+                <div class="share-menu-options">
+                    <a href="https://wa.me/?text=${shareText}" target="_blank" rel="noopener"><span>💬</span>WhatsApp</a>
+                    <a href="sms:?body=${shareText}"><span>✉️</span>SMS</a>
+                    <button type="button" onclick="copyShareLink('${shareData.url}', 'Instagram')"><span>📷</span>Instagram</button>
+                    <button type="button" onclick="copyShareLink('${shareData.url}', 'Snapchat')"><span>👻</span>Snapchat</button>
+                </div>
+                <button type="button" class="share-menu-close">Close</button>
+            </div>`;
+        document.body.appendChild(menu);
+        menu.addEventListener("click", event => {
+            if (event.target === menu || event.target.classList.contains("share-menu-close")) {
+                menu.hidden = true;
+            }
+        });
+    }
+    menu.hidden = false;
+}
+
+// Instagram and Snapchat have no direct web-share URL, so the link is copied for the user to paste
+function copyShareLink(url, appName) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert(`Link copied! Open ${appName} and paste it to share SimSim Fun Store.`);
+    }).catch(() => {
+        prompt(`Copy this link to share on ${appName}:`, url);
+    });
+}
