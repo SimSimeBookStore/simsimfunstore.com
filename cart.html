@@ -171,6 +171,9 @@
 
         // Run render on page load
         document.addEventListener("DOMContentLoaded", () => {
+            if (new URLSearchParams(window.location.search).has("token")) {
+                localStorage.removeItem("simsim_pending_checkout");
+            }
             renderCart();
         });
     </script>

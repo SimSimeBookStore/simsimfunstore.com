@@ -70,7 +70,45 @@
             if (typeof updateCartCount === 'function') {
                 updateCartCount();
             }
+            completeEmailVerification();
         });
+
+        async function completeEmailVerification() {
+            if (!hasSupabaseConnection()) return;
+
+            const verificationParams = new URLSearchParams(window.location.hash.substring(1));
+            const authorizationCode = new URLSearchParams(window.location.search).get("code");
+            const verificationError = verificationParams.get("error_description");
+            if (verificationError) {
+                alert(`Email verification failed: ${verificationError.replace(/\+/g, " ")}`);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            if (authorizationCode) {
+                const { error } = await window.supabaseClient.auth.exchangeCodeForSession(authorizationCode);
+                if (error) {
+                    alert("Your email link could not be completed. Please request a new confirmation email and try again.");
+                    return;
+                }
+            }
+
+            const hasVerificationResponse = authorizationCode || verificationParams.has("access_token") || verificationParams.get("type") === "signup";
+            if (!hasVerificationResponse) return;
+
+            const { data, error } = await window.supabaseClient.auth.getSession();
+            if (error || !data.session?.user) {
+                alert("Your email link could not be completed. Please request a new confirmation email and try again.");
+                return;
+            }
+
+            const email = data.session.user.email;
+            localStorage.setItem("simsim_user", email);
+            localStorage.setItem("simsim_remember", "true");
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert(`Email verified. Welcome to SimSim Fun Store, ${email}!`);
+            window.location.assign("index.html");
+        }
 
         async function hashPassword(password) {
             const data = new TextEncoder().encode(password);
@@ -166,7 +204,7 @@
             const { error } = await window.supabaseClient.auth.signUp({
                 email: emailInput,
                 password: passwordInput,
-                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
+                options: { emailRedirectTo: "https://www.simsimfunstore.com/login.html" }
             });
             if (error) {
                 alert(formatAuthError(error));
@@ -185,7 +223,7 @@
             const { error } = await window.supabaseClient.auth.resend({
                 type: "signup",
                 email,
-                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
+                options: { emailRedirectTo: "https://www.simsimfunstore.com/login.html" }
             });
             if (error) {
                 alert(formatAuthError(error));
