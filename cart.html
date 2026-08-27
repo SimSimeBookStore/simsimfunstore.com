@@ -35,8 +35,9 @@
             <h3>🔒 Secure Parent Checkout</h3>
             <p style="margin: 10px 0; color: #666;">You can checkout instantly as a <strong>Guest</strong> or log into your account to save items to your permanent digital library.</p>
             
-            <div style="margin-top: 1.5rem; display: flex; gap: 15px; flex-wrap: wrap;">
+            <div style="margin-top: 1.5rem; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                 <button class="btn" style="background: #0070ba;" onclick="payWithPayPal()">Pay with PayPal 🅿️</button>
+                <a href="https://paypal.me/simsimestore" target="_blank" rel="noopener noreferrer" class="btn" style="background: #00457C; text-decoration: none; display: inline-flex; align-items: center;">Pay via PayPal.me 💳</a>
             </div>
             <p id="payment-status" style="margin-top: 1rem; color: #666;"></p>
         </div>
@@ -165,7 +166,8 @@
                 window.location.href = order.approvalLink;
             } catch (error) {
                 console.error("Could not start PayPal checkout.", error);
-                status.textContent = error.message || "Could not connect to PayPal. Please try again.";
+                status.innerHTML = (error.message || "Could not connect to PayPal. Please try again.") +
+                    '<br>Or pay directly via <a href="https://paypal.me/simsimestore" target="_blank" rel="noopener noreferrer" style="color: #0070ba; text-decoration: underline; font-weight: bold;">paypal.me/simsimestore</a>';
             }
         }
 

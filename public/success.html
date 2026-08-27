@@ -130,6 +130,19 @@
                 `;
             }).join('');
 
+            // Save confirmed purchase to local user library ONLY after payment is verified
+            const currentUser = pendingCheckout.user || localStorage.getItem("simsim_user");
+            if (currentUser) {
+                const libraryKey = `simsim_library_${currentUser}`;
+                let userLibrary = JSON.parse(localStorage.getItem(libraryKey)) || [];
+                cart.forEach(item => {
+                    if (!userLibrary.some(existing => existing.id === item.id)) {
+                        userLibrary.push(item);
+                    }
+                });
+                localStorage.setItem(libraryKey, JSON.stringify(userLibrary));
+            }
+
             // Clear both active and pending checkout state after fulfillment.
             localStorage.removeItem("simsim_cart");
             localStorage.removeItem("simsim_pending_checkout");

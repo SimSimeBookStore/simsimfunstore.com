@@ -67,14 +67,45 @@ function checkUserSessionState() {
     const coloringContainer = document.getElementById("nav-coloring-container");
 
     if (user) {
-        // Change login link text to "Sign Out"
-        if (loginNav) {
-            loginNav.textContent = "Sign Out 🚪";
-            loginNav.href = "#";
-            loginNav.onclick = (e) => {
-                e.preventDefault();
-                logoutUser();
-            };
+        const email = user;
+        const namePart = email.split('@')[0];
+        let displayName = namePart
+            .replace(/[._-]/g, ' ')
+            .replace(/\b\w/g, char => char.toUpperCase()) || "Parent";
+
+        const renderUserNav = (nameToDisplay) => {
+            const currentNav = document.getElementById("nav-login");
+            if (!currentNav) return;
+
+            const htmlContent = `
+                <a href="#" onclick="logoutUser(); return false;" style="color: #e53e3e; font-weight: bold; text-decoration: none; margin-left: 0;">Sign Out 🚪</a>
+                <span style="font-size: 0.78rem; color: #2D3748; font-weight: 600; margin-top: 2px;">Welcome, ${nameToDisplay}</span>
+            `;
+
+            if (currentNav.tagName.toLowerCase() === "a") {
+                const container = document.createElement("div");
+                container.id = "nav-login";
+                container.className = "user-nav-container";
+                container.style.cssText = "display: inline-flex; flex-direction: column; align-items: center; text-align: center; line-height: 1.2; margin-left: 15px; vertical-align: middle;";
+                container.innerHTML = htmlContent;
+                currentNav.parentNode.replaceChild(container, currentNav);
+            } else {
+                currentNav.style.cssText = "display: inline-flex; flex-direction: column; align-items: center; text-align: center; line-height: 1.2; margin-left: 15px; vertical-align: middle;";
+                currentNav.innerHTML = htmlContent;
+            }
+        };
+
+        renderUserNav(displayName);
+
+        if (typeof getSupabaseUser === 'function') {
+            getSupabaseUser().then(sbUser => {
+                if (sbUser && sbUser.user_metadata) {
+                    const fullName = sbUser.user_metadata.full_name || sbUser.user_metadata.name;
+                    if (fullName) {
+                        renderUserNav(fullName);
+                    }
+                }
+            }).catch(() => {});
         }
 
         // Check if user owns a coloring activity book
@@ -90,9 +121,17 @@ function checkUserSessionState() {
         }
     } else {
         if (loginNav) {
-            loginNav.textContent = "Parent Login";
-            loginNav.href = "login.html";
-            loginNav.onclick = null;
+            if (loginNav.tagName.toLowerCase() !== "a") {
+                const link = document.createElement("a");
+                link.id = "nav-login";
+                link.href = "login.html";
+                link.textContent = "Parent Login";
+                loginNav.parentNode.replaceChild(link, loginNav);
+            } else {
+                loginNav.textContent = "Parent Login";
+                loginNav.href = "login.html";
+                loginNav.onclick = null;
+            }
         }
         if (coloringContainer) {
             coloringContainer.innerHTML = `<a href="#" onclick="alert('Please log in and purchase a coloring activity book to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Requires Login">🎨 Coloring Studio (Locked)</a>`;
@@ -109,6 +148,10 @@ async function logoutUser() {
     localStorage.removeItem("simsim_remember");
     alert("You have been signed out safely.");
     window.location.href = "index.html";
+}
+
+function logout() {
+    logoutUser();
 }
 
 // Cart Management System using Browser LocalStorage
