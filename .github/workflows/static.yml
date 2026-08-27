@@ -38,6 +38,7 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+          name: github-pages-${{ github.run_attempt }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
