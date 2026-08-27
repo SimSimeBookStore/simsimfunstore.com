@@ -50,7 +50,6 @@
             const listContainer = document.getElementById("purchased-items-list");
             const pendingCheckout = JSON.parse(localStorage.getItem("simsim_pending_checkout")) || null;
             if (!pendingCheckout?.orderId) {
-                localStorage.removeItem("simsim_pending_checkout");
                 alert("No active PayPal order was found. Your items are still in the cart.");
                 window.location.href = "cart.html";
                 return;
@@ -58,7 +57,6 @@
             const { data, error } = await window.supabaseClient.auth.getSession();
             const accessToken = data?.session?.access_token;
             if (error || !accessToken) {
-                localStorage.removeItem("simsim_pending_checkout");
                 alert("Please sign in again to verify this payment.");
                 window.location.href = "login.html";
                 return;
@@ -77,13 +75,11 @@
             try {
                 captureResult = captureText ? JSON.parse(captureText) : {};
             } catch (parseError) {
-                localStorage.removeItem("simsim_pending_checkout");
                 alert(`Payment service returned an invalid response (${captureResponse.status}).`);
                 window.location.href = "cart.html";
                 return;
             }
             if (!captureResponse.ok || !captureResult.paid) {
-                localStorage.removeItem("simsim_pending_checkout");
                 alert(captureResult.error || "Payment could not be verified. Your items remain in the cart.");
                 window.location.href = "cart.html";
                 return;
