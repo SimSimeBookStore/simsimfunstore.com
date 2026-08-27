@@ -71,9 +71,10 @@
             if (hasSupabaseConnection()) {
                 try {
                     const onlineLibrary = await loadLibraryFromSupabase();
-                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
+                    userLibrary = onlineLibrary || [];
                 } catch (error) {
                     console.error("Could not load the online library.", error);
+                    userLibrary = [];
                 }
             }
             if (userLibrary.length === 0) {
