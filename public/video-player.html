@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Video - SimSim Fun Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Library 📚</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container" style="max-width: 900px;">
+        <div id="video-container" style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); text-align: center;">
+            <p style="color: #666;">Loading your video...</p>
+        </div>
+    </main>
+
+    <footer>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const container = document.getElementById("video-container");
+            const productId = new URLSearchParams(window.location.search).get("id");
+            let user = localStorage.getItem("simsim_user");
+            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                    library = user ? await loadLibraryFromSupabase() || [] : [];
+                } catch (error) {
+                    console.error("Could not load the online video library.", error);
+                    user = null;
+                    library = [];
+                }
+            }
+            const video = library.find(item => item.id === productId && item.type === "video");
+            const catalogVideo = typeof SIMSIM_PRODUCTS !== "undefined"
+                ? SIMSIM_PRODUCTS.find(item => item.id === productId && item.type === "video")
+                : null;
+            const videoSource = (catalogVideo?.videoUrl || video?.videoUrl || "").trim();
+
+            if (!user) {
+                container.innerHTML = '<h2>🔒 Sign In Required</h2><p style="margin: 15px 0; color: #666;">Please sign in to watch your purchased video.</p><a href="login.html" class="btn">Sign In 🔐</a>';
+                return;
+            }
+
+            if (!video) {
+                container.innerHTML = '<h2>Video Not Available</h2><p style="margin: 15px 0; color: #666;">This video is available after purchase.</p><a href="catalog.html" class="btn">Browse Catalog 🛒</a>';
+                return;
+            }
+
+            if (!videoSource) {
+                container.innerHTML = '<h2>Video Not Available</h2><p style="margin: 15px 0; color: #666;">No video source is configured for this title yet.</p><a href="dashboard.html" class="btn">Back to My Library 📚</a>';
+                return;
+            }
+
+            const isLocalVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(videoSource || "");
+            const localVideoSource = isLocalVideo ? encodeURI(videoSource) : "";
+            const isCanvaLink = /(^https?:\/\/)?(www\.)?canva\.link\//i.test(videoSource);
+            const playerMarkup = isLocalVideo
+                ? `<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #1a202c; border-radius: 12px; overflow: hidden;">
+                    <video controls playsinline preload="metadata" title="${video.title}" style="width: 100%; height: 100%; object-fit: contain;">
+                        <source src="${localVideoSource}" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>`
+                : isCanvaLink
+                ? `<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                    <iframe src="${videoSource}" title="${video.title}" style="width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                </div>
+                <p style="margin-top: 1rem; color: #666;">If the video does not load in the frame, open it directly.</p>
+                <a href="${videoSource}" target="_blank" rel="noopener" class="btn">Open Video in New Tab ▶</a>`
+                : `<div style="padding: 2rem; background: #fff8e1; border: 1px solid #f6d365; border-radius: 12px;">
+                    <p style="color: #665200; margin-bottom: 1rem;">This video file has not been uploaded to the website yet.</p>
+                    <a href="${videoSource}" target="_blank" rel="noopener" class="btn">Watch Current Video ▶</a>
+                </div>`;
+
+            container.innerHTML = `
+                <h1 style="margin-bottom: 1.5rem;">${video.title}</h1>
+                ${playerMarkup}
+                <a href="dashboard.html" class="btn" style="margin-top: 1.5rem; background: #4ECDC4;">Back to My Library 📚</a>
+            `;
+
+            const renderedVideo = container.querySelector("video");
+            if (renderedVideo) {
+                renderedVideo.muted = false;
+                renderedVideo.defaultMuted = false;
+                renderedVideo.volume = 1;
+            }
+        });
+    </script>
+</body>
+</html>

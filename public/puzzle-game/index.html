@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Game - Hub</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+            background:
+                radial-gradient(circle at 8% 12%, rgba(245, 176, 65, 0.96) 0 9%, transparent 10%),
+                radial-gradient(circle at 90% 16%, rgba(59, 130, 246, 0.94) 0 11%, transparent 12%),
+                radial-gradient(circle at 18% 84%, rgba(16, 185, 129, 0.92) 0 10%, transparent 11%),
+                radial-gradient(circle at 85% 86%, rgba(244, 63, 94, 0.92) 0 10%, transparent 11%),
+                linear-gradient(145deg, #fde047 0%, #f9a8d4 48%, #7dd3fc 100%);
+        }
+        .game-card {
+            width: min(300px, 100%);
+            background: linear-gradient(145deg, #bfdbfe 0%, #fde68a 45%, #fbcfe8 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 3px solid #d97706;
+            box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+        }
+        .games-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            align-items: stretch;
+            margin-top: 16px;
+        }
+        .puzzle-preview {
+            width: 100%;
+            max-width: 220px;
+            border-radius: 10px;
+            margin: 10px auto 14px;
+            display: block;
+            border: 4px solid #ffffff;
+            outline: 3px solid #2563eb;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
+            background: linear-gradient(135deg, #93c5fd, #f472b6, #4ade80);
+        }
+        a { text-decoration: none; color: #2563eb; font-weight: bold; font-size: 1.1rem; }
+        .home-button {
+            display: inline-block;
+            margin: 8px 0 18px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: #172033;
+            color: #ffffff;
+            font-size: 1rem;
+            box-shadow: 0 5px 10px rgba(15, 23, 42, 0.2);
+        }
+        .home-button:hover { background: #334155; }
+        .game-price {
+            margin: 8px 0 6px;
+            color: #b91c1c;
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+        .buy-button {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 8px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: #16a34a;
+            color: #ffffff;
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .buy-button:hover { background: #15803d; }
+        .play-button {
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .play-button.is-locked {
+            color: #64748b;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Puzzle Game</h1>
+    <p>Select a game to play below:</p>
+    <a class="home-button" href="../index.html">Home</a>
+
+    <div class="games-grid">
+        <div class="game-card">
+            <h2>Find the Animal</h2>
+            <p>Match all 25 animals to their correct spots!</p>
+            <p class="game-price">$3.00</p>
+            <button class="buy-button" type="button" data-product-id="game-find-the-animal" onclick="addToCart('game-find-the-animal')">Buy 🛒</button>
+            <img class="puzzle-preview" src="games/find-the-animal/assets/mainpuzzle.png" alt="Find the Animal puzzle preview">
+            <br>
+            <a class="play-button" href="games/find-the-animal/index.html" data-product-id="game-find-the-animal">Play Game</a>
+        </div>
+
+        <div class="game-card">
+            <h2>Collect the Image</h2>
+            <p>Drag and arrange pieces to complete the full picture!</p>
+            <p class="game-price">$3.00</p>
+            <button class="buy-button" type="button" data-product-id="game-collect-the-image" onclick="addToCart('game-collect-the-image')">Buy 🛒</button>
+            <img class="puzzle-preview" src="games/collect-the-image/assets/front.png" alt="Collect the Image puzzle preview">
+            <br>
+            <a class="play-button" href="games/collect-the-image/index.html" data-product-id="game-collect-the-image">Play Game</a>
+        </div>
+
+        <div class="game-card">
+            <h2>Count the Animals</h2>
+            <p>Choose an animal and count the correct number of friends!</p>
+            <p class="game-price">$3.50</p>
+            <button class="buy-button" type="button" data-product-id="game-count-the-animals" onclick="addToCart('game-count-the-animals')">Buy 🛒</button>
+            <img class="puzzle-preview" src="games/counting-game/images/count the animals.png" alt="Count the Animals game preview">
+            <br>
+            <a class="play-button" href="games/counting-game/index.html" data-product-id="game-count-the-animals">Play Game</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-data.js"></script>
+    <script src="../js/products.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            let user = localStorage.getItem("simsim_user");
+            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser?.email || user;
+                    const onlineLibrary = supabaseUser ? await loadLibraryFromSupabase() : null;
+                    if (onlineLibrary) library = onlineLibrary;
+                } catch (error) {
+                    console.error("Could not load the online puzzle library.", error);
+                }
+            }
+
+            document.querySelectorAll(".buy-button[data-product-id]").forEach(button => {
+                if (!library.some(item => item.id === button.dataset.productId)) return;
+
+                button.disabled = true;
+                button.textContent = "Purchased ✓";
+                button.title = "This game is already in your library";
+            });
+
+            document.querySelectorAll(".play-button[data-product-id]").forEach(button => {
+                if (library.some(item => item.id === button.dataset.productId)) return;
+
+                button.href = "#";
+                button.textContent = "🔒 Buy to Play";
+                button.classList.add("is-locked");
+                button.setAttribute("aria-disabled", "true");
+                button.title = user ? "Purchase this game to unlock it" : "Sign in and purchase this game to unlock it";
+                button.addEventListener("click", event => event.preventDefault());
+            });
+        });
+    </script>
+</body>
+</html>

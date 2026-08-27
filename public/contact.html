@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - SimSim Fun Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Library 📚</a>
+            <a href="login.html">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container contact-shell">
+        <section class="contact-card">
+            <div class="contact-heading">
+                <span class="contact-icon" aria-hidden="true">✉</span>
+                <p class="home-kicker">We would love to hear from you</p>
+                <h1>Contact Us</h1>
+                <p>Send us a message about your child's learning and fun experience.</p>
+            </div>
+            <form id="contact-form" class="contact-form" action="https://formsubmit.co/simsimebookstore@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="New SimSim Fun Store contact message">
+                <input type="hidden" name="_replyto" id="contact-reply-to">
+                <input type="hidden" name="_next" value="https://www.simsimfunstore.com/">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <label for="contact-name">Name</label>
+                <input id="contact-name" name="name" type="text" required autocomplete="name" placeholder="Your name">
+                <label for="contact-email">Email address</label>
+                <input id="contact-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com" oninput="document.getElementById('contact-reply-to').value = this.value">
+                <label for="contact-subject">Subject</label>
+                <input id="contact-subject" name="subject" type="text" required placeholder="How can we help?">
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" name="message" rows="6" required placeholder="Write your message here..."></textarea>
+                <button type="submit" class="btn contact-submit">Send Message ✉</button>
+            </form>
+            <p class="contact-note">Your message will be sent securely, and replies will go to your email address.</p>
+        </section>
+    </main>
+
+    <footer>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids. Parent Gate Enabled.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

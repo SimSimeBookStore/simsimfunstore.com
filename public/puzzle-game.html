@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Puzzles - SimSim Fun Store</title>
+    <meta name="description" content="Play free picture puzzles from SimSim Fun Store.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalog.html">Explore</a>
+            <a href="/puzzle-game" class="active">Puzzles 🧩</a>
+            <a href="dashboard.html">My Library 📚</a>
+            <a href="login.html" id="nav-login">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container puzzle-shell">
+        <div class="puzzle-heading">
+            <p class="home-kicker">Free play time</p>
+            <h1 id="puzzle-title">Picture Puzzles 🧩</h1>
+            <p>Choose a picture, shuffle the pieces, and put the adventure back together.</p>
+        </div>
+
+        <div class="puzzle-toolbar">
+            <div class="puzzle-picker" id="puzzle-picker" aria-label="Choose a puzzle"></div>
+            <div class="puzzle-stats">Moves: <span id="move-count">0</span></div>
+        </div>
+
+        <div class="puzzle-board" id="puzzle-board" aria-label="3 by 3 picture puzzle"></div>
+
+        <div class="puzzle-actions">
+            <button class="btn" id="shuffle-button" type="button">Shuffle 🔀</button>
+            <button class="btn puzzle-reset-button" id="reset-button" type="button">Reset ↺</button>
+        </div>
+        <p class="puzzle-message" id="puzzle-message" role="status" aria-live="polite"></p>
+    </main>
+
+    <footer>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe &amp; Fun for Kids.</p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const puzzles = SIMSIM_PRODUCTS.filter(product => product.type === "puzzle");
+            const board = document.getElementById("puzzle-board");
+            const picker = document.getElementById("puzzle-picker");
+            const title = document.getElementById("puzzle-title");
+            const moveCount = document.getElementById("move-count");
+            const message = document.getElementById("puzzle-message");
+            const requestedId = new URLSearchParams(window.location.search).get("id");
+            let selectedPuzzle = puzzles.find(puzzle => puzzle.id === requestedId) || puzzles[0];
+            let tiles = [];
+            let moves = 0;
+
+            function solved() {
+                return tiles.every((tile, index) => tile === index);
+            }
+
+            function renderBoard() {
+                board.innerHTML = tiles.map((tile, index) => {
+                    const x = tile % 3;
+                    const y = Math.floor(tile / 3);
+                    const tileStyle = tile === 0
+                        ? "background: #ffffff; cursor: default;"
+                        : `background-image: url('${selectedPuzzle.images[0]}'); background-size: 300% 300%; background-position: ${x * 50}% ${y * 50}%;`;
+                    return `<button class="puzzle-tile" type="button" aria-label="${tile === 0 ? "Empty space" : `Puzzle piece ${tile}`}" data-index="${index}" style="${tileStyle}"></button>`;
+                }).join("");
+                board.querySelectorAll(".puzzle-tile").forEach(tile => {
+                    tile.addEventListener("click", () => moveTile(Number(tile.dataset.index)));
+                });
+            }
+
+            function moveTile(index) {
+                const blankIndex = tiles.indexOf(0);
+                const sameRow = Math.floor(index / 3) === Math.floor(blankIndex / 3);
+                const adjacent = (sameRow && Math.abs(index - blankIndex) === 1) || Math.abs(index - blankIndex) === 3;
+                if (!adjacent) return;
+                [tiles[index], tiles[blankIndex]] = [tiles[blankIndex], tiles[index]];
+                moves += 1;
+                moveCount.textContent = moves;
+                renderBoard();
+                if (solved()) message.textContent = `You solved it in ${moves} moves! Great job! 🎉`;
+            }
+
+            function resetPuzzle(shuffle = false) {
+                tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+                moves = 0;
+                moveCount.textContent = moves;
+                message.textContent = "";
+                if (shuffle) {
+                    for (let index = tiles.length - 1; index > 0; index -= 1) {
+                        const randomIndex = Math.floor(Math.random() * (index + 1));
+                        [tiles[index], tiles[randomIndex]] = [tiles[randomIndex], tiles[index]];
+                    }
+                    if (solved()) [tiles[0], tiles[1]] = [tiles[1], tiles[0]];
+                }
+                renderBoard();
+            }
+
+            function selectPuzzle(puzzle) {
+                selectedPuzzle = puzzle;
+                title.textContent = `${puzzle.title} 🧩`;
+                picker.querySelectorAll("button").forEach(button => button.classList.toggle("active", button.dataset.id === puzzle.id));
+                resetPuzzle(true);
+            }
+
+            puzzles.forEach(puzzle => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.dataset.id = puzzle.id;
+                button.textContent = puzzle.title;
+                button.addEventListener("click", () => selectPuzzle(puzzle));
+                picker.appendChild(button);
+            });
+            document.getElementById("shuffle-button").addEventListener("click", () => resetPuzzle(true));
+            document.getElementById("reset-button").addEventListener("click", () => resetPuzzle(false));
+            selectPuzzle(selectedPuzzle);
+        });
+    </script>
+</body>
+</html>

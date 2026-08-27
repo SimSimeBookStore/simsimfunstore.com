@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore - SimSim Fun Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <!-- Coloring Studio Link (Managed dynamically by app.js) -->
+            <span id="nav-coloring-container">
+                <a href="#" onclick="alert('Please log in and purchase a coloring activity book to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Requires Login">🎨 Coloring Studio (Locked)</a>
+            </span>
+            <a href="dashboard.html" id="nav-dashboard">My Library 📚</a>
+            <a href="login.html" id="nav-login">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <section class="hero" style="padding: 2.5rem 2rem;">
+        <h1>Explore Our Library 📚</h1>
+        <p>Browse magical comics, audio storybooks, and bedtime videos for kids.</p>
+    </section>
+
+    <main class="container">
+        <h2 class="section-title">✨ All Available Stories & Activities</h2>
+        <div class="product-grid" id="catalog-products">
+            <!-- Products injected dynamically -->
+        </div>
+    </main>
+
+    <footer>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <!-- Essential Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const catalogContainer = document.getElementById("catalog-products");
+            
+            if (catalogContainer && typeof SIMSIM_PRODUCTS !== "undefined") {
+                catalogContainer.innerHTML = SIMSIM_PRODUCTS.map(product => {
+                    // Safely extract the first image from your image array
+                    const mainImage = (product.images && product.images.length > 0) ? product.images[0] : (product.coverImage || '');
+                    
+                    return `
+                        <div class="product-card">
+                            <img src="${mainImage}" alt="${product.title}">
+                            <div class="product-info">
+                                <span class="badge">${product.category}</span>
+                                <h3>${product.title}</h3>
+                                <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${product.ageGroup}</p>
+                                <div class="price">${product.type === "puzzle" ? "Free to play" : `$${product.price.toFixed(2)}`}</div>
+                                <div style="display: flex; gap: 8px; margin-top: auto;">
+                                    ${product.type === "puzzle"
+                                        ? `<a href="/puzzle-game?id=${product.id}" class="btn" style="background: #FF6B6B; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">Play 🧩</a>`
+                                        : `<a href="product-detail.html?id=${product.id}" class="btn" style="background: #4ECDC4; flex: 1; font-size: 0.9rem; text-align: center; text-decoration: none;">View 🔍</a><button class="btn" onclick="addToCart('${product.id}')" style="flex: 1; font-size: 0.9rem;">Buy 🛒</button>`}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
+    </script>
+</body>
+</html>

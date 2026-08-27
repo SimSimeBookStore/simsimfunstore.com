@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Login - SimSim Fun Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="login.html" class="active">Parent Login</a>
+            <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container login-shell">
+        <div class="login-card">
+            <div class="login-heading">
+                <span class="login-mark" aria-hidden="true">🔐</span>
+                <p class="eyebrow">SimSim Fun Store</p>
+                <h1>Parent Portal</h1>
+                <p>Sign in to access your purchases on any device.</p>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-field">
+                    <label for="login-email">Email address</label>
+                    <input type="email" id="login-email" required autocomplete="username" placeholder="parent@example.com">
+                </div>
+
+                <div class="form-field">
+                    <label for="login-password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="login-password" required minlength="6" autocomplete="current-password" placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Show password">Show</button>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <label class="remember-option"><input type="checkbox" id="remember-me" checked> <span>Keep me signed in</span></label>
+                </div>
+
+                <div class="login-actions">
+                    <button type="submit" class="btn primary-action">Sign In 🚀</button>
+                    <button type="button" class="btn secondary-action" onclick="registerAccount()">Create New Account</button>
+                </div>
+            </form>
+
+            <p class="login-note">Your purchases and library are linked to your Supabase account.</p>
+        </div>
+    </main>
+
+    <footer>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof updateCartCount === 'function') {
+                updateCartCount();
+            }
+        });
+
+        async function hashPassword(password) {
+            const data = new TextEncoder().encode(password);
+            const hash = await crypto.subtle.digest("SHA-256", data);
+            return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById("login-password");
+            const toggleButton = document.querySelector(".password-toggle");
+            const isHidden = passwordInput.type === "password";
+            passwordInput.type = isHidden ? "text" : "password";
+            toggleButton.textContent = isHidden ? "Hide" : "Show";
+            toggleButton.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById("login-email").value.trim();
+            const passwordInput = document.getElementById("login-password").value;
+            const rememberMe = document.getElementById("remember-me").checked;
+
+            if (!emailInput || passwordInput.length < 6) {
+                alert("Please enter a valid email address and a password with at least 6 characters.");
+                return;
+            }
+
+            if (hasSupabaseConnection()) {
+                const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
+                    email: emailInput,
+                    password: passwordInput
+                });
+                if (signInError) {
+                    if (signInError.code === "email_not_confirmed") {
+                        showConfirmationMessage(emailInput);
+                    } else {
+                        alert(formatAuthError(signInError));
+                    }
+                    return;
+                }
+                try {
+                    await migrateAllLocalPurchasesToSupabase(emailInput);
+                } catch (migrationError) {
+                    console.error("Could not migrate local purchases.", migrationError);
+                    alert("Signed in, but old purchases could not be synchronized. Please open My Library and try again.");
+                }
+                localStorage.setItem("simsim_user", emailInput);
+                localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
+                alert(`Welcome back, ${emailInput}! 🎉`);
+                window.location.assign("index.html");
+                return;
+            }
+
+            try {
+                const accountKey = emailInput.toLowerCase();
+                const accounts = JSON.parse(localStorage.getItem("simsim_accounts")) || {};
+                const passwordHash = await hashPassword(passwordInput);
+
+                if (accounts[accountKey] && accounts[accountKey].passwordHash !== passwordHash) {
+                    alert("That password is incorrect. Please try again.");
+                    return;
+                }
+
+                if (!accounts[accountKey]) {
+                    accounts[accountKey] = { passwordHash };
+                    localStorage.setItem("simsim_accounts", JSON.stringify(accounts));
+                }
+
+                localStorage.setItem("simsim_user", emailInput);
+                localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
+            } catch (error) {
+                console.warn("Could not save the local account.", error);
+                alert("Unable to save your account on this browser. Please enable site storage and try again.");
+                return;
+            }
+
+            alert(`Welcome back, ${emailInput}! 🎉`);
+
+            window.location.assign("index.html");
+        }
+
+        async function registerAccount() {
+            const emailInput = document.getElementById("login-email").value.trim();
+            const passwordInput = document.getElementById("login-password").value;
+            if (!emailInput || passwordInput.length < 6) {
+                alert("Enter a valid email and a password with at least 6 characters.");
+                return;
+            }
+            if (!hasSupabaseConnection()) {
+                alert("Online account registration is not configured.");
+                return;
+            }
+            const { error } = await window.supabaseClient.auth.signUp({
+                email: emailInput,
+                password: passwordInput,
+                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
+            });
+            if (error) {
+                alert(formatAuthError(error));
+                return;
+            }
+            alert("Account created. Check your email once to confirm your account, then sign in.");
+        }
+
+        function showConfirmationMessage(email) {
+            const message = "Your email is not confirmed yet. Check your inbox and spam folder, then click the confirmation link.";
+            const resend = confirm(`${message}\n\nResend the confirmation email?`);
+            if (resend) resendConfirmationEmail(email);
+        }
+
+        async function resendConfirmationEmail(email) {
+            const { error } = await window.supabaseClient.auth.resend({
+                type: "signup",
+                email,
+                options: { emailRedirectTo: "https://simsimfunstore.com/login.html" }
+            });
+            if (error) {
+                alert(formatAuthError(error));
+                return;
+            }
+            alert("A new confirmation email was sent. Please check your inbox and spam folder.");
+        }
+
+        function formatAuthError(error) {
+            if (error.status === 429 || /rate limit|too many requests/i.test(error.message)) {
+                return "Too many email requests. Please wait a few minutes before trying again. Sign in does not send another email.";
+            }
+            return error.message || "Sign in failed. Check your email and password.";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Animal - Puzzle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <header class="top-header">
+            <div class="title-wrap">
+                <h1>🦁 Find the Animal!</h1>
+                <p>Pick an animal from the tray and drop it onto its matching silhouette!</p>
+            </div>
+            <a href="../../index.html" class="exit-btn" aria-label="Exit to main page">Exit</a>
+        </header>
+
+        <div class="game-board">
+            <!-- Main Board / Grid of target slots -->
+            <div class="drop-zone-grid" id="dropZoneGrid">
+                <!-- Dynamically generated or statically mapped slots (1 to 25) -->
+            </div>
+
+            <!-- Tray of selectable animal pieces -->
+            <div class="animal-tray" id="animalTray">
+                <!-- Dynamically generated animal pieces -->
+            </div>
+        </div>
+
+        <div class="score-board">
+            <span id="scoreText">Found: 0 / 25</span>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="chirrupAudio" src="assets/yes.mp3" preload="auto"></audio>
+    <audio id="hornAudio" src="assets/no.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

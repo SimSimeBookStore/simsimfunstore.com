@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloring Studio - SimSim Fun Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon2.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/icon2.png" alt="" aria-hidden="true"><span>SimSim Fun<br>Store</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="coloring.html" class="active">🎨 Coloring Studio</a>
+            <a href="dashboard.html">My Library 📚</a>
+        </nav>
+    </header>
+
+    <main class="container" style="text-align: center;">
+        <div id="coloring-gate" style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); max-width: 700px; margin: 0 auto;">
+            <!-- Content changes dynamically depending on login & purchase status -->
+        </div>
+    </main>
+
+    <footer>
+        <a href="contact.html" class="footer-contact" aria-label="Contact SimSim Fun Store" title="Contact Us">✉ Contact</a>
+        <button type="button" class="footer-share-btn" onclick="shareWebsite()" aria-label="Share SimSim Fun Store">📤 Share</button>
+        <p>&copy; 2026 SimSim Fun Store. Safe & Fun for Kids.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-data.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            let user = localStorage.getItem("simsim_user");
+            const gateContainer = document.getElementById("coloring-gate");
+
+            if (hasSupabaseConnection()) {
+                try {
+                    const supabaseUser = await getSupabaseUser();
+                    user = supabaseUser ? supabaseUser.email : null;
+                } catch (error) {
+                    console.error("Could not verify the online session.", error);
+                    user = null;
+                }
+            }
+
+            if (!user) {
+                gateContainer.innerHTML = `
+                    <h2>🔒 Parent Login Required</h2>
+                    <p style="margin: 15px 0; color: #666;">Please log into your account to access the Interactive Coloring Studio.</p>
+                    <a href="login.html" class="btn">Sign In 🔐</a>
+                `;
+                return;
+            }
+
+            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+            if (hasSupabaseConnection()) {
+                try {
+                    const onlineLibrary = await loadLibraryFromSupabase();
+                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
+                } catch (error) {
+                    console.error("Could not load the online coloring library.", error);
+                }
+            }
+
+            const coloringBooks = userLibrary.filter(item => item.type === "coloring-activity");
+
+            if (coloringBooks.length === 0) {
+                gateContainer.innerHTML = `
+                    <h2>🎨 Coloring Studio Locked</h2>
+                    <p style="margin: 15px 0; color: #666;">You need to purchase a coloring activity book (like <b>Fire Truck Freddie's Hero Adventure</b> or <b>My Comic Coloring Book</b>) to unlock this drawing studio!</p>
+                    <a href="catalog.html" class="btn" style="background: #4ECDC4;">Browse Catalog & Buy 🛒</a>
+                `;
+                return;
+            }
+
+            const requestedBookId = new URLSearchParams(window.location.search).get("book");
+            const selectedBook = coloringBooks.find(book => book.id === requestedBookId) || coloringBooks[0];
+
+            gateContainer.innerHTML = `
+                <h2 style="margin-bottom: 10px;">🎨 SimSim Interactive Coloring Studio</h2>
+                <p id="book-title" style="margin-bottom: 20px; color: #555;"></p>
+                
+                <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                    <div id="color-palette" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;"></div>
+                    <label style="display: inline-flex; align-items: center; gap: 5px; color: #555;">More colors
+                        <input id="custom-color" type="color" value="#FF6B6B" onchange="setPenColor(this.value)" style="width: 38px; height: 32px; padding: 1px; cursor: pointer;">
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 5px; color: #555;">Brush
+                        <input id="brush-size" type="range" min="2" max="24" value="8" style="width: 90px;">
+                    </label>
+                    <button id="eraser-button" onclick="toggleEraser()" class="btn" style="padding: 5px 12px;">Eraser ✏️</button>
+                    <button id="undo-button" onclick="undoLastStroke()" class="btn" style="padding: 5px 12px;" disabled>Undo ↶</button>
+                    <button onclick="clearCanvas()" class="btn" style="background: #e53e3e; padding: 5px 12px; font-size: 0.9rem;">Clear 🧹</button>
+                    <button onclick="changeZoom(-0.25)" class="btn" style="padding: 5px 12px;">Zoom Out −</button>
+                    <strong id="zoom-level">100%</strong>
+                    <button onclick="changeZoom(0.25)" class="btn" style="padding: 5px 12px;">Zoom In +</button>
+                </div>
+
+                <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px;">
+                    <button id="previous-page" class="btn" onclick="changePage(-1)" style="padding: 7px 12px;">← Previous</button>
+                    <strong id="page-counter"></strong>
+                    <button id="next-page" class="btn" onclick="changePage(1)" style="padding: 7px 12px;">Next →</button>
+                </div>
+
+                <div id="page-stage" style="position: relative; display: inline-block; width: min(100%, 700px); max-height: 75vh; line-height: 0; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px; overflow: auto; text-align: left;">
+                    <div id="zoom-layer" style="position: relative; width: 100%;">
+                        <canvas id="pdfCanvas" style="display: block; width: 100%; height: auto;"></canvas>
+                        <canvas id="paintCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none;"></canvas>
+                    </div>
+                </div>
+            `;
+
+            initStudio(selectedBook, user);
+        });
+
+        let penColor = "#FF6B6B";
+        let currentBook = null;
+        let currentUser = null;
+        let currentPage = 0;
+        let pageDrawings = {};
+        let pageHistories = {};
+        let pdfDocument = null;
+        let eraserEnabled = false;
+        let strokeCanvas = null;
+        let strokeContext = null;
+        let strokeBase = null;
+        let regionMask = null;
+        let zoomLevel = 1;
+
+        const paletteColors = ["#EF4444", "#F97316", "#F59E0B", "#EAB308", "#84CC16", "#22C55E", "#14B8A6", "#06B6D4", "#3B82F6", "#6366F1", "#A855F7", "#EC4899", "#92400E", "#F8FAFC", "#1F2937"];
+
+        function setPenColor(color) {
+            penColor = color;
+            const customColor = document.getElementById("custom-color");
+            if (customColor) customColor.value = color;
+        }
+
+        function initStudio(book, user) {
+            currentBook = book;
+            currentUser = user;
+            document.getElementById("book-title").textContent = `${book.title} - choose a page and start coloring!`;
+            document.getElementById("color-palette").innerHTML = paletteColors.map(color =>
+                `<button aria-label="Choose ${color}" onclick="setPenColor('${color}')" style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e0; cursor: pointer;"></button>`
+            ).join('');
+            pageDrawings = JSON.parse(localStorage.getItem(getDrawingKey())) || {};
+            pageHistories = {};
+            initCanvas();
+            loadPdf(book.downloadUrl);
+        }
+
+        function getDrawingKey() {
+            return `simsim_coloring_${currentUser}_${currentBook ? currentBook.id : "book"}`;
+        }
+
+        function loadPage(pageIndex) {
+            if (!pdfDocument) return;
+            currentPage = Math.max(0, Math.min(pageIndex, pdfDocument.numPages - 1));
+            document.getElementById("page-counter").textContent = `Page ${currentPage + 1} of ${pdfDocument.numPages}`;
+            document.getElementById("previous-page").disabled = currentPage === 0;
+            document.getElementById("next-page").disabled = currentPage === pdfDocument.numPages - 1;
+            renderPdfPage(currentPage + 1);
+        }
+
+        function changePage(direction) {
+            saveCurrentDrawing();
+            loadPage(currentPage + direction);
+        }
+
+        async function loadPdf(pdfUrl) {
+            if (!window.pdfjsLib) {
+                document.getElementById("book-title").textContent = "The coloring pages could not be loaded. Please check your internet connection and reload.";
+                return;
+            }
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+            try {
+                pdfDocument = await pdfjsLib.getDocument(pdfUrl).promise;
+                loadPage(0);
+            } catch (error) {
+                console.error("Could not load coloring PDF.", error);
+                document.getElementById("book-title").textContent = "The coloring book PDF could not be loaded. Please reload and try again.";
+            }
+        }
+
+        async function renderPdfPage(pageNumber) {
+            const page = await pdfDocument.getPage(pageNumber);
+            const baseViewport = page.getViewport({ scale: 1 });
+            const scale = Math.min(700 / baseViewport.width, 1.5);
+            const viewport = page.getViewport({ scale });
+            const pdfCanvas = document.getElementById("pdfCanvas");
+            const paintCanvas = document.getElementById("paintCanvas");
+            pdfCanvas.width = viewport.width;
+            pdfCanvas.height = viewport.height;
+            paintCanvas.width = viewport.width;
+            paintCanvas.height = viewport.height;
+            await page.render({ canvasContext: pdfCanvas.getContext("2d"), viewport }).promise;
+            applyZoom();
+            const savedDrawing = pageDrawings[currentPage];
+            const paintContext = paintCanvas.getContext("2d");
+            if (savedDrawing) {
+                const savedImage = new Image();
+                savedImage.onload = () => paintContext.drawImage(savedImage, 0, 0);
+                savedImage.src = savedDrawing;
+            } else {
+                paintContext.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+            }
+            updateUndoButton();
+        }
+
+        function changeZoom(amount) {
+            zoomLevel = Math.max(0.75, Math.min(3, zoomLevel + amount));
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const zoomLayer = document.getElementById("zoom-layer");
+            const zoomLabel = document.getElementById("zoom-level");
+            if (!zoomLayer) return;
+            zoomLayer.style.width = `${zoomLevel * 100}%`;
+            if (zoomLabel) zoomLabel.textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        function saveCurrentDrawing() {
+            const canvas = document.getElementById("paintCanvas");
+            if (canvas && canvas.width) {
+                pageDrawings[currentPage] = canvas.toDataURL("image/png");
+                localStorage.setItem(getDrawingKey(), JSON.stringify(pageDrawings));
+            }
+        }
+
+        function toggleEraser() {
+            eraserEnabled = !eraserEnabled;
+            const eraserButton = document.getElementById("eraser-button");
+            eraserButton.textContent = eraserEnabled ? "Eraser On 🧽" : "Eraser ✏️";
+            eraserButton.style.background = eraserEnabled ? "#718096" : "";
+            eraserButton.style.color = eraserEnabled ? "white" : "";
+        }
+
+        function updateUndoButton() {
+            const undoButton = document.getElementById("undo-button");
+            if (undoButton) undoButton.disabled = !(pageHistories[currentPage] && pageHistories[currentPage].length);
+        }
+
+        function undoLastStroke() {
+            const history = pageHistories[currentPage];
+            const canvas = document.getElementById("paintCanvas");
+            if (!history || !history.length || !canvas) return;
+            const previousDrawing = history.pop();
+            const context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            if (previousDrawing) {
+                const savedImage = new Image();
+                savedImage.onload = () => context.drawImage(savedImage, 0, 0);
+                savedImage.src = previousDrawing;
+            }
+            saveCurrentDrawing();
+            updateUndoButton();
+        }
+
+        function initCanvas() {
+            const canvas = document.getElementById("paintCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            let painting = false;
+
+            canvas.addEventListener("pointerdown", (e) => {
+                painting = true;
+                canvas.setPointerCapture(e.pointerId);
+                if (!pageHistories[currentPage]) pageHistories[currentPage] = [];
+                pageHistories[currentPage].push(canvas.toDataURL("image/png"));
+                updateUndoButton();
+                strokeBase = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                strokeCanvas = document.createElement("canvas");
+                strokeCanvas.width = canvas.width;
+                strokeCanvas.height = canvas.height;
+                strokeContext = strokeCanvas.getContext("2d");
+                const point = getCanvasPoint(e);
+                regionMask = createRegionMask(point.x, point.y);
+                strokeContext.beginPath();
+                strokeContext.moveTo(point.x, point.y);
+            });
+            canvas.addEventListener("pointerup", (e) => {
+                if (!painting) return;
+                painting = false;
+                canvas.releasePointerCapture(e.pointerId);
+                renderConstrainedStroke();
+                strokeCanvas = null;
+                strokeContext = null;
+                strokeBase = null;
+                regionMask = null;
+                saveCurrentDrawing();
+            });
+            canvas.addEventListener("pointercancel", () => { painting = false; });
+            canvas.addEventListener("pointermove", draw);
+
+            function createRegionMask(startX, startY) {
+                const pdfCanvas = document.getElementById("pdfCanvas");
+                const pdfContext = pdfCanvas.getContext("2d");
+                const pixels = pdfContext.getImageData(0, 0, canvas.width, canvas.height).data;
+                const mask = new Uint8Array(canvas.width * canvas.height);
+                const start = Math.floor(startY) * canvas.width + Math.floor(startX);
+                const queue = [start];
+                const visited = new Uint8Array(mask.length);
+                const isLine = index => {
+                    const red = pixels[index * 4];
+                    const green = pixels[index * 4 + 1];
+                    const blue = pixels[index * 4 + 2];
+                    return (red + green + blue) / 3 < 180;
+                };
+                if (start < 0 || start >= mask.length || isLine(start)) return mask;
+                visited[start] = 1;
+                while (queue.length) {
+                    const index = queue.pop();
+                    mask[index] = 255;
+                    const x = index % canvas.width;
+                    const neighbors = [index - 1, index + 1, index - canvas.width, index + canvas.width];
+                    neighbors.forEach(neighbor => {
+                        const neighborX = neighbor % canvas.width;
+                        if (neighbor < 0 || neighbor >= mask.length || visited[neighbor] ||
+                            Math.abs(neighborX - x) > 1 || isLine(neighbor)) return;
+                        visited[neighbor] = 1;
+                        queue.push(neighbor);
+                    });
+                }
+                return mask;
+            }
+
+            function renderConstrainedStroke() {
+                if (!strokeCanvas || !regionMask) return;
+                const maskCanvas = document.createElement("canvas");
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const maskContext = maskCanvas.getContext("2d");
+                const maskImage = maskContext.createImageData(canvas.width, canvas.height);
+                for (let index = 0; index < regionMask.length; index++) {
+                    maskImage.data[index * 4 + 3] = regionMask[index];
+                }
+                maskContext.putImageData(maskImage, 0, 0);
+                strokeContext.globalCompositeOperation = "destination-in";
+                strokeContext.drawImage(maskCanvas, 0, 0);
+                ctx.putImageData(strokeBase, 0, 0);
+                ctx.globalCompositeOperation = eraserEnabled ? "destination-out" : "source-over";
+                ctx.drawImage(strokeCanvas, 0, 0);
+                ctx.globalCompositeOperation = "source-over";
+            }
+
+            function getCanvasPoint(e) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: (e.clientX - rect.left) * canvas.width / rect.width,
+                    y: (e.clientY - rect.top) * canvas.height / rect.height
+                };
+            }
+
+            function draw(e) {
+                if (!painting) return;
+                strokeContext.lineWidth = Number(document.getElementById("brush-size").value);
+                strokeContext.lineCap = "round";
+                strokeContext.globalCompositeOperation = "source-over";
+                strokeContext.strokeStyle = eraserEnabled ? "rgba(0, 0, 0, 1)" : penColor;
+                const point = getCanvasPoint(e);
+                strokeContext.lineTo(point.x, point.y);
+                strokeContext.stroke();
+                strokeContext.beginPath();
+                strokeContext.moveTo(point.x, point.y);
+                renderConstrainedStroke();
+            }
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById("paintCanvas");
+            if (canvas) {
+                const ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                delete pageDrawings[currentPage];
+                pageHistories[currentPage] = [];
+                localStorage.setItem(getDrawingKey(), JSON.stringify(pageDrawings));
+                updateUndoButton();
+            }
+        }
+    </script>
+</body>
+</html>

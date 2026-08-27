@@ -1,5 +1,10 @@
 name = "simsimfunstore"
 compatibility_date = "2026-08-23"
+pages_build_output_dir = "public"
+
+[vars]
+PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com"
+SUPABASE_URL = "https://vcsfpaemlxofgbtuksct.supabase.co"
 
 [[d1_databases]]
 binding = "DB"
