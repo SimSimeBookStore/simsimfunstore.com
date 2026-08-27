@@ -70,7 +70,6 @@
             let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
             if (hasSupabaseConnection()) {
                 try {
-                    await migrateLocalLibraryToSupabase(userLibrary);
                     const onlineLibrary = await loadLibraryFromSupabase();
                     if (onlineLibrary !== null) userLibrary = onlineLibrary;
                 } catch (error) {

@@ -22,6 +22,14 @@ export async function onRequestPost({ request, env }) {
         const expectedTotal = storedOrder.total_cents / 100;
         const accessToken = await getPayPalToken(env);
         const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+        const orderResponse = await fetch(`${apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
+            headers: { authorization: `Bearer ${accessToken}` }
+        });
+        const currentOrder = await orderResponse.json();
+        if (!orderResponse.ok || currentOrder.id !== orderId || currentOrder.status !== "APPROVED" ||
+            currentOrder.purchase_units?.[0]?.custom_id !== user.id) {
+            return json({ error: "PayPal payment was not approved. No items were added." }, 402);
+        }
         const response = await fetch(`${apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, {
             method: "POST",
             headers: {

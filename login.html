@@ -149,12 +149,6 @@
                     }
                     return;
                 }
-                try {
-                    await migrateAllLocalPurchasesToSupabase(emailInput);
-                } catch (migrationError) {
-                    console.error("Could not migrate local purchases.", migrationError);
-                    alert("Signed in, but old purchases could not be synchronized. Please open My Library and try again.");
-                }
                 localStorage.setItem("simsim_user", emailInput);
                 localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
                 alert(`Welcome back, ${emailInput}! 🎉`);
