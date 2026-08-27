@@ -1,45 +1,4 @@
-const PRODUCTS = {
-    "prod-3": 5.00,
-    "prod-9": 5.00,
-    "prod-10": 5.00,
-    "prod-1": 3.00,
-    "prod-2": 4.85,
-    "prod-4": 4.85,
-    "prod-5": 4.85,
-    "prod-6": 4.85,
-    "prod-7": 4.85,
-    "prod-8": 4.85
-};
-
-function json(data, status = 200) {
-    return new Response(JSON.stringify(data), {
-        status,
-        headers: { "content-type": "application/json" }
-    });
-}
-
-async function getUser(request, env) {
-    const authorization = request.headers.get("authorization");
-    if (!authorization || !env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return null;
-    const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-        headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, authorization }
-    });
-    return response.ok ? response.json() : null;
-}
-
-async function getPayPalToken(env) {
-    const credentials = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`);
-    const response = await fetch(`${env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com"}/v1/oauth2/token`, {
-        method: "POST",
-        headers: {
-            authorization: `Basic ${credentials}`,
-            "content-type": "application/x-www-form-urlencoded"
-        },
-        body: "grant_type=client_credentials"
-    });
-    if (!response.ok) throw new Error("PayPal authentication failed");
-    return (await response.json()).access_token;
-}
+import { fulfillOrder, getOrder, getPayPalToken, getUser, json } from "./_shared.js";
 
 export async function onRequestPost({ request, env }) {
     try {
@@ -48,13 +7,19 @@ export async function onRequestPost({ request, env }) {
 
         const body = await request.json();
         const orderId = typeof body.orderId === "string" ? body.orderId : "";
-        const items = Array.isArray(body.items) ? body.items : [];
-        const ids = [...new Set(items.map(item => item?.id))];
-        if (!orderId || !ids.length || ids.length !== items.length || ids.some(id => !PRODUCTS[id])) {
+        if (!orderId) {
             return json({ error: "Invalid order or cart." }, 400);
         }
 
-        const expectedTotal = ids.reduce((sum, id) => sum + PRODUCTS[id], 0);
+        const storedOrder = await getOrder(env, orderId);
+        if (!storedOrder || storedOrder.user_id !== user.id) {
+            return json({ error: "This PayPal order is not valid for the signed-in account." }, 403);
+        }
+        if (storedOrder.status === "FULFILLED") {
+            return json({ paid: true, transactionId: storedOrder.capture_id });
+        }
+
+        const expectedTotal = storedOrder.total_cents / 100;
         const accessToken = await getPayPalToken(env);
         const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
         const response = await fetch(`${apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, {
@@ -71,39 +36,9 @@ export async function onRequestPost({ request, env }) {
         const capturedTotal = Number(captured?.amount?.value);
         const paid = response.ok && order.status === "COMPLETED" && captured?.status === "COMPLETED" &&
             captured?.amount?.currency_code === "USD" && capturedTotal === expectedTotal &&
-            capturedUnit?.custom_id === user.id;
+            capturedUnit?.custom_id === user.id && order.id === orderId;
         if (!paid) return json({ error: "PayPal payment could not be verified." }, 402);
-
-        const rows = ids.map(id => ({
-            user_id: user.id,
-            product_id: id,
-            product_data: { id },
-            paypal_transaction_id: captured.id,
-            payment_status: "completed"
-        }));
-        const supabaseHeaders = {
-            apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-            authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-            "content-type": "application/json",
-            prefer: "resolution=merge-duplicates"
-        };
-        const libraryResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/library_items?on_conflict=user_id,product_id`, {
-            method: "POST",
-            headers: supabaseHeaders,
-            body: JSON.stringify(rows.map(row => ({
-                user_id: row.user_id,
-                product_id: row.product_id,
-                product_data: row.product_data
-            })))
-        });
-        if (!libraryResponse.ok) throw new Error("Could not save library items");
-
-        const purchaseResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/purchases`, {
-            method: "POST",
-            headers: supabaseHeaders,
-            body: JSON.stringify(rows)
-        });
-        if (!purchaseResponse.ok && purchaseResponse.status !== 409) throw new Error("Could not save purchase");
+        await fulfillOrder(env, storedOrder, captured.id);
 
         return json({ paid: true, transactionId: captured.id });
     } catch (error) {

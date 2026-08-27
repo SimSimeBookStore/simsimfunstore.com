@@ -68,7 +68,7 @@
                     "content-type": "application/json",
                     authorization: `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({ orderId: pendingCheckout.orderId, items: pendingCheckout.items })
+                body: JSON.stringify({ orderId: pendingCheckout.orderId })
             });
             const captureText = await captureResponse.text();
             let captureResult = {};
