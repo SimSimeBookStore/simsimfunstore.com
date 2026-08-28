@@ -107,13 +107,18 @@
             localStorage.setItem("simsim_remember", "true");
             window.history.replaceState({}, document.title, window.location.pathname);
             alert(`Email verified. Welcome to SimSim Fun Store, ${email}!`);
-            window.location.assign("index.html");
+            window.location.assign(postLoginDestination());
         }
 
         async function hashPassword(password) {
             const data = new TextEncoder().encode(password);
             const hash = await crypto.subtle.digest("SHA-256", data);
             return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        function postLoginDestination() {
+            const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+            return returnTo === "cart.html" ? returnTo : "index.html";
         }
 
         function togglePassword() {
@@ -152,7 +157,7 @@
                 localStorage.setItem("simsim_user", emailInput);
                 localStorage.setItem("simsim_remember", rememberMe ? "true" : "false");
                 alert(`Welcome back, ${emailInput}! 🎉`);
-                window.location.assign("index.html");
+                window.location.assign(postLoginDestination());
                 return;
             }
 
@@ -181,7 +186,7 @@
 
             alert(`Welcome back, ${emailInput}! 🎉`);
 
-            window.location.assign("index.html");
+            window.location.assign(postLoginDestination());
         }
 
         async function registerAccount() {
@@ -198,7 +203,7 @@
             const { error } = await window.supabaseClient.auth.signUp({
                 email: emailInput,
                 password: passwordInput,
-                options: { emailRedirectTo: "https://www.simsimfunstore.com/login.html" }
+                options: { emailRedirectTo: new URL(`login.html?returnTo=${postLoginDestination()}`, window.location.href).href }
             });
             if (error) {
                 alert(formatAuthError(error));
@@ -217,7 +222,7 @@
             const { error } = await window.supabaseClient.auth.resend({
                 type: "signup",
                 email,
-                options: { emailRedirectTo: "https://www.simsimfunstore.com/login.html" }
+                options: { emailRedirectTo: new URL(`login.html?returnTo=${postLoginDestination()}`, window.location.href).href }
             });
             if (error) {
                 alert(formatAuthError(error));

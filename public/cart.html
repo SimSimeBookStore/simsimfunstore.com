@@ -38,7 +38,7 @@
         <!-- Checkout Section -->
         <div id="checkout-section" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: none;">
             <h3>🔒 Secure Parent Checkout</h3>
-            <p style="margin: 10px 0; color: #666;">You can checkout instantly as a <strong>Guest</strong> or log into your account to save items to your permanent digital library.</p>
+            <p style="margin: 10px 0; color: #666;">Create or sign in to a parent account before checkout so your purchases are saved to your digital library.</p>
             
             <div style="margin-top: 1.5rem; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                 <button class="btn" style="background: #0070ba;" onclick="payWithPayPal()">Pay with PayPal 🅿️</button>
@@ -124,12 +124,9 @@
                 if (!userError && userData.user?.id) return sessionData.session.access_token;
                 await window.supabaseClient.auth.signOut();
             }
-
-            const { data, error } = await window.supabaseClient.auth.signInAnonymously();
-            if (error || !data.session?.access_token) {
-                throw new Error("Guest checkout is unavailable. Please try again or sign in to your store account.");
-            }
-            return data.session.access_token;
+            localStorage.removeItem("simsim_user");
+            window.location.assign("login.html?returnTo=cart.html");
+            return null;
         }
 
         async function payWithPayPal() {
@@ -146,6 +143,7 @@
                     throw new Error("Open the site with VS Code Go Live or use a deployed website to check out.");
                 }
                 const accessToken = await getCheckoutAccessToken();
+                if (!accessToken) return;
 
                 const apiOrigin = window.location.hostname.endsWith(".pages.dev")
                     ? window.location.origin
