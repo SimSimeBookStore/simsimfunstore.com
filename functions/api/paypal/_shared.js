@@ -20,7 +20,18 @@ const ALLOWED_ORIGINS = new Set([
 
 function corsOrigin(request) {
     const origin = request?.headers?.get("origin");
-    return ALLOWED_ORIGINS.has(origin) ? origin : "https://www.simsimfunstore.com";
+    if (ALLOWED_ORIGINS.has(origin) || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || "")) {
+        return origin;
+    }
+    return "https://www.simsimfunstore.com";
+}
+
+function storeOrigin(request, env) {
+    const origin = request?.headers?.get("origin");
+    if (ALLOWED_ORIGINS.has(origin) || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || "")) {
+        return origin;
+    }
+    return env.STORE_ORIGIN || "https://www.simsimfunstore.com";
 }
 
 function json(data, status = 200, request) {
@@ -144,5 +155,6 @@ export {
     getUser,
     json,
     options,
-    saveOrder
+    saveOrder,
+    storeOrigin
 };

@@ -54,11 +54,16 @@
                 window.location.href = "cart.html";
                 return;
             }
+            if (!window.supabaseClient) {
+                alert("Online checkout is not available on this page.");
+                window.location.href = "login.html";
+                return;
+            }
             const { data, error } = await window.supabaseClient.auth.getSession();
             const accessToken = data?.session?.access_token;
             if (error || !accessToken) {
-                alert("Please sign in again to verify this payment.");
-                window.location.href = "login.html";
+                alert("Your checkout session expired. Your items remain in the cart.");
+                window.location.href = "cart.html";
                 return;
             }
 

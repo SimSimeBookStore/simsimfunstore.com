@@ -113,13 +113,22 @@
             renderCart(); // Refresh cart view immediately
         }
 
-        async function payWithPayPal() {
-            if (!localStorage.getItem("simsim_user")) {
-                alert("Please sign in before buying an item.");
-                window.location.href = "login.html";
-                return;
+        async function getCheckoutAccessToken() {
+            if (!window.supabaseClient) {
+                throw new Error("Online checkout is not available on this page.");
             }
+            const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+            if (sessionError) throw sessionError;
+            if (sessionData.session?.access_token) return sessionData.session.access_token;
 
+            const { data, error } = await window.supabaseClient.auth.signInAnonymously();
+            if (error || !data.session?.access_token) {
+                throw new Error("Guest checkout is unavailable. Please try again or sign in to your store account.");
+            }
+            return data.session.access_token;
+        }
+
+        async function payWithPayPal() {
             const cart = JSON.parse(localStorage.getItem("simsim_cart")) || [];
             if (cart.length === 0) {
                 alert("Your cart is empty!");
@@ -129,18 +138,10 @@
             const status = document.getElementById("payment-status");
             status.textContent = "Connecting to PayPal...";
             try {
-                if (window.location.protocol === "file:" ||
-                    ["localhost", "127.0.0.1"].includes(window.location.hostname)) {
-                    throw new Error("PayPal checkout works only on the deployed Cloudflare website, not VS Code Go Live.");
+                if (window.location.protocol === "file:") {
+                    throw new Error("Open the site with VS Code Go Live or use a deployed website to check out.");
                 }
-                if (!window.supabaseClient) {
-                    throw new Error("Online sign-in is not available on this page.");
-                }
-                const { data, error } = await window.supabaseClient.auth.getSession();
-                const accessToken = data?.session?.access_token;
-                if (error || !accessToken) {
-                    throw new Error("Please sign in again before paying.");
-                }
+                const accessToken = await getCheckoutAccessToken();
 
                 const apiOrigin = window.location.hostname.endsWith(".pages.dev")
                     ? window.location.origin
