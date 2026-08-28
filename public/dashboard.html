@@ -67,15 +67,7 @@
             document.getElementById("user-display").textContent = `Logged in as: ${user}`;
             const libraryContainer = document.getElementById("user-library");
 
-            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
-            if (hasSupabaseConnection()) {
-                try {
-                    const onlineLibrary = await loadLibraryFromSupabase();
-                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
-                } catch (error) {
-                    console.error("Could not load the online library.", error);
-                }
-            }
+            const userLibrary = await getUserLibraryMerged(user);
             if (userLibrary.length === 0) {
                 libraryContainer.innerHTML = "<p style='color: #666;'>Your library is empty. Purchase a book or video from the catalog to see it here permanently! 📚</p>";
                 return;

@@ -39,19 +39,21 @@
             const container = document.getElementById("video-container");
             const productId = new URLSearchParams(window.location.search).get("id");
             let user = localStorage.getItem("simsim_user");
-            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
+
             if (hasSupabaseConnection()) {
                 try {
                     const supabaseUser = await getSupabaseUser();
-                    user = supabaseUser ? supabaseUser.email : null;
-                    library = user ? await loadLibraryFromSupabase() || [] : [];
+                    if (supabaseUser?.email) {
+                        user = supabaseUser.email;
+                        localStorage.setItem("simsim_user", user);
+                    }
                 } catch (error) {
-                    console.error("Could not load the online video library.", error);
-                    user = null;
-                    library = [];
+                    console.error("Could not verify the online session.", error);
                 }
             }
-            const video = library.find(item => item.id === productId && item.type === "video");
+
+            const library = user ? await getUserLibraryMerged(user) : [];
+            const video = library.find(item => item.id === productId && (item.type === "video" || !item.type));
             const catalogVideo = typeof SIMSIM_PRODUCTS !== "undefined"
                 ? SIMSIM_PRODUCTS.find(item => item.id === productId && item.type === "video")
                 : null;

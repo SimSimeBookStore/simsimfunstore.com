@@ -39,21 +39,21 @@
             const container = document.getElementById("reader-container");
             const productId = new URLSearchParams(window.location.search).get("id");
             let user = localStorage.getItem("simsim_user");
-            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
 
             if (hasSupabaseConnection()) {
                 try {
                     const supabaseUser = await getSupabaseUser();
-                    user = supabaseUser ? supabaseUser.email : null;
-                    library = user ? await loadLibraryFromSupabase() || [] : [];
+                    if (supabaseUser?.email) {
+                        user = supabaseUser.email;
+                        localStorage.setItem("simsim_user", user);
+                    }
                 } catch (error) {
-                    console.error("Could not load the online library.", error);
-                    user = null;
-                    library = [];
+                    console.error("Could not verify the online session.", error);
                 }
             }
 
-            const book = library.find(item => item.id === productId && item.type === "book");
+            const library = user ? await getUserLibraryMerged(user) : [];
+            const book = library.find(item => item.id === productId && (item.type === "book" || !item.type));
             if (!user) {
                 container.innerHTML = '<h2>🔒 Sign In Required</h2><p>Please sign in to read your purchased books.</p><a href="login.html" class="btn">Sign In 🔐</a>';
                 return;

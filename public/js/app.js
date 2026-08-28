@@ -109,15 +109,29 @@ function checkUserSessionState() {
         }
 
         // Check if user owns a coloring activity book
-        const userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
-        const hasColoringBook = userLibrary.some(item => item.type === "coloring-activity");
-
-        if (coloringContainer) {
+        const updateColoringStudioLink = (lib) => {
+            if (!coloringContainer) return;
+            const hasColoringBook = lib.some(item => {
+                const catalogProduct = (typeof SIMSIM_PRODUCTS !== "undefined" && Array.isArray(SIMSIM_PRODUCTS))
+                    ? SIMSIM_PRODUCTS.find(p => p.id === item.id)
+                    : null;
+                const itemType = item.type || catalogProduct?.type;
+                return itemType === "coloring-activity";
+            });
             if (hasColoringBook) {
                 coloringContainer.innerHTML = `<a href="coloring.html" style="color: var(--primary-color); font-weight: bold;">🎨 Coloring Studio</a>`;
             } else {
                 coloringContainer.innerHTML = `<a href="#" onclick="alert('Please purchase a coloring activity book from the catalog to unlock the Coloring Studio!'); return false;" style="color: #A0AEC0; cursor: not-allowed;" title="Purchase a coloring book to unlock">🎨 Coloring Studio (Locked)</a>`;
             }
+        };
+
+        const initialLocalLib = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
+        updateColoringStudioLink(initialLocalLib);
+
+        if (typeof getUserLibraryMerged === "function") {
+            getUserLibraryMerged(user).then(mergedLib => {
+                if (mergedLib) updateColoringStudioLink(mergedLib);
+            }).catch(() => {});
         }
     } else {
         if (loginNav) {

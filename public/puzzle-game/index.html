@@ -130,18 +130,20 @@
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             let user = localStorage.getItem("simsim_user");
-            let library = user ? JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [] : [];
 
             if (hasSupabaseConnection()) {
                 try {
                     const supabaseUser = await getSupabaseUser();
-                    user = supabaseUser?.email || user;
-                    const onlineLibrary = supabaseUser ? await loadLibraryFromSupabase() : null;
-                    if (onlineLibrary) library = onlineLibrary;
+                    if (supabaseUser?.email) {
+                        user = supabaseUser.email;
+                        localStorage.setItem("simsim_user", user);
+                    }
                 } catch (error) {
-                    console.error("Could not load the online puzzle library.", error);
+                    console.error("Could not verify the online session.", error);
                 }
             }
+
+            const library = user ? await getUserLibraryMerged(user) : [];
 
             document.querySelectorAll(".buy-button[data-product-id]").forEach(button => {
                 if (!library.some(item => item.id === button.dataset.productId)) return;

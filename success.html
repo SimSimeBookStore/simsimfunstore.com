@@ -136,8 +136,12 @@
                 const libraryKey = `simsim_library_${currentUser}`;
                 let userLibrary = JSON.parse(localStorage.getItem(libraryKey)) || [];
                 cart.forEach(item => {
-                    if (!userLibrary.some(existing => existing.id === item.id)) {
-                        userLibrary.push(item);
+                    const catalogProduct = typeof SIMSIM_PRODUCTS !== "undefined"
+                        ? SIMSIM_PRODUCTS.find(product => product.id === item.id)
+                        : null;
+                    const fullItem = catalogProduct ? { ...catalogProduct, ...item } : item;
+                    if (!userLibrary.some(existing => existing.id === fullItem.id)) {
+                        userLibrary.push(fullItem);
                     }
                 });
                 localStorage.setItem(libraryKey, JSON.stringify(userLibrary));

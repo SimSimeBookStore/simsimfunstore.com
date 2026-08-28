@@ -60,16 +60,7 @@
                 return;
             }
 
-            let userLibrary = JSON.parse(localStorage.getItem(`simsim_library_${user}`)) || [];
-            if (hasSupabaseConnection()) {
-                try {
-                    const onlineLibrary = await loadLibraryFromSupabase();
-                    if (onlineLibrary !== null) userLibrary = onlineLibrary;
-                } catch (error) {
-                    console.error("Could not load the online coloring library.", error);
-                }
-            }
-
+            const userLibrary = await getUserLibraryMerged(user);
             const coloringBooks = userLibrary.filter(item => item.type === "coloring-activity");
 
             if (coloringBooks.length === 0) {
