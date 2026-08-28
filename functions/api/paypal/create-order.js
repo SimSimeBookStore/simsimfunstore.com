@@ -1,19 +1,19 @@
 import { PRODUCT_PRICES, getPayPalToken, getUser, json, options, saveOrder } from "./_shared.js";
 
-export function onRequestOptions() {
-    return options();
+export function onRequestOptions({ request }) {
+    return options(request);
 }
 
 export async function onRequestPost({ request, env }) {
     try {
         const user = await getUser(request, env);
-        if (!user?.id) return json({ error: "Please sign in before paying." }, 401);
+        if (!user?.id) return json({ error: "Please sign in before paying." }, 401, request);
 
         const body = await request.json();
         const items = Array.isArray(body.items) ? body.items : [];
         const ids = [...new Set(items.map(item => item?.id))];
         if (!ids.length || ids.length !== items.length || ids.some(id => !PRODUCT_PRICES[id])) {
-            return json({ error: "The cart contains an invalid product." }, 400);
+            return json({ error: "The cart contains an invalid product." }, 400, request);
         }
 
         const total = ids.reduce((sum, id) => sum + PRODUCT_PRICES[id], 0);
@@ -42,19 +42,19 @@ export async function onRequestPost({ request, env }) {
             })
         });
         const order = await response.json();
-        if (!response.ok || !order.id) return json({ error: "Could not create PayPal order." }, 502);
+        if (!response.ok || !order.id) return json({ error: "Could not create PayPal order." }, 502, request);
 
         const approvalLink = order.links?.find(link => link.rel === "approve")?.href;
-        if (!approvalLink) return json({ error: "PayPal did not provide an approval link." }, 502);
+        if (!approvalLink) return json({ error: "PayPal did not provide an approval link." }, 502, request);
         await saveOrder(env, {
             orderId: order.id,
             userId: user.id,
             productIds: ids,
             totalCents: Math.round(total * 100)
         });
-        return json({ orderId: order.id, approvalLink });
+        return json({ orderId: order.id, approvalLink }, 200, request);
     } catch (error) {
         console.error(error);
-        return json({ error: "Unable to start PayPal checkout." }, 500);
+        return json({ error: "Unable to start PayPal checkout." }, 500, request);
     }
 }

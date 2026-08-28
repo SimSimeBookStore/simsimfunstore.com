@@ -11,23 +11,34 @@ const PRODUCT_PRICES = {
     "prod-8": 4.85
 };
 
-function json(data, status = 200) {
+const ALLOWED_ORIGINS = new Set([
+    "https://simsimfunstore.com",
+    "https://www.simsimfunstore.com",
+    "https://simsimfunstore-com.pages.dev"
+]);
+
+function corsOrigin(request) {
+    const origin = request?.headers?.get("origin");
+    return ALLOWED_ORIGINS.has(origin) ? origin : "https://www.simsimfunstore.com";
+}
+
+function json(data, status = 200, request) {
     return new Response(JSON.stringify(data), {
         status,
         headers: {
-            "access-control-allow-origin": "https://www.simsimfunstore.com",
+            "access-control-allow-origin": corsOrigin(request),
             "content-type": "application/json"
         }
     });
 }
 
-function options() {
+function options(request) {
     return new Response(null, {
         status: 204,
         headers: {
             "access-control-allow-headers": "authorization, content-type",
             "access-control-allow-methods": "POST, OPTIONS",
-            "access-control-allow-origin": "https://www.simsimfunstore.com"
+            "access-control-allow-origin": corsOrigin(request)
         }
     });
 }
