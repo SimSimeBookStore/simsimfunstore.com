@@ -1,4 +1,8 @@
-import { fulfillOrder, getOrder, getPayPalToken, getUser, json } from "./_shared.js";
+import { fulfillOrder, getOrder, getPayPalToken, getUser, json, options } from "./_shared.js";
+
+export function onRequestOptions() {
+    return options();
+}
 
 export async function onRequestPost({ request, env }) {
     try {

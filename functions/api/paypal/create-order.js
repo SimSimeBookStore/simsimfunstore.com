@@ -1,4 +1,8 @@
-import { PRODUCT_PRICES, getPayPalToken, getUser, json, saveOrder } from "./_shared.js";
+import { PRODUCT_PRICES, getPayPalToken, getUser, json, options, saveOrder } from "./_shared.js";
+
+export function onRequestOptions() {
+    return options();
+}
 
 export async function onRequestPost({ request, env }) {
     try {
@@ -32,8 +36,8 @@ export async function onRequestPost({ request, env }) {
                 application_context: {
                     brand_name: "SimSim Fun Store",
                     user_action: "PAY_NOW",
-                    return_url: `${new URL(request.url).origin}/success.html`,
-                    cancel_url: `${new URL(request.url).origin}/cart.html`
+                    return_url: `${env.STORE_ORIGIN || "https://www.simsimfunstore.com"}/success.html`,
+                    cancel_url: `${env.STORE_ORIGIN || "https://www.simsimfunstore.com"}/cart.html`
                 }
             })
         });

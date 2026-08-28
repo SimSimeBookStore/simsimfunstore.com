@@ -14,7 +14,21 @@ const PRODUCT_PRICES = {
 function json(data, status = 200) {
     return new Response(JSON.stringify(data), {
         status,
-        headers: { "content-type": "application/json" }
+        headers: {
+            "access-control-allow-origin": "https://www.simsimfunstore.com",
+            "content-type": "application/json"
+        }
+    });
+}
+
+function options() {
+    return new Response(null, {
+        status: 204,
+        headers: {
+            "access-control-allow-headers": "authorization, content-type",
+            "access-control-allow-methods": "POST, OPTIONS",
+            "access-control-allow-origin": "https://www.simsimfunstore.com"
+        }
     });
 }
 
@@ -117,5 +131,6 @@ export {
     getPayPalToken,
     getUser,
     json,
+    options,
     saveOrder
 };

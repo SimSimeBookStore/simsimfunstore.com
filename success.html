@@ -62,7 +62,7 @@
                 return;
             }
 
-            const captureResponse = await fetch("/api/paypal/capture-order", {
+            const captureResponse = await fetch("https://simsimfunstore-com.pages.dev/api/paypal/capture-order", {
                 method: "POST",
                 headers: {
                     "content-type": "application/json",
