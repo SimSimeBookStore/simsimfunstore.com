@@ -8,7 +8,10 @@ const PRODUCT_PRICES = {
     "prod-5": 4.85,
     "prod-6": 4.85,
     "prod-7": 4.85,
-    "prod-8": 4.85
+    "prod-8": 4.85,
+    "game-find-the-animal": 3.00,
+    "game-collect-the-image": 3.00,
+    "game-count-the-animals": 3.50
 };
 
 const ALLOWED_ORIGINS = new Set([
