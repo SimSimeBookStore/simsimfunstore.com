@@ -37,7 +37,6 @@
             
             <div style="margin-top: 1.5rem; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                 <button class="btn" style="background: #0070ba;" onclick="payWithPayPal()">Pay with PayPal 🅿️</button>
-                <a id="paypal-me-link" href="https://paypal.me/simsimestore" target="_blank" rel="noopener noreferrer" class="btn" style="background: #00457C; text-decoration: none; display: inline-flex; align-items: center;">Pay via PayPal.me 💳</a>
             </div>
             <p id="payment-status" style="margin-top: 1rem; color: #666;"></p>
         </div>
@@ -99,8 +98,6 @@
                     <h3 style="font-size: 1.4rem;">Total: $${total.toFixed(2)}</h3>
                 </div>
             `;
-
-            document.getElementById("paypal-me-link").href = `https://paypal.me/simsimestore/${total.toFixed(2)}`;
         }
 
         // Function to delete a specific item from the cart based on its list position (index)
@@ -171,8 +168,7 @@
                 window.location.href = order.approvalLink;
             } catch (error) {
                 console.error("Could not start PayPal checkout.", error);
-                status.innerHTML = (error.message || "Could not connect to PayPal. Please try again.") +
-                    `<br>Or pay directly via <a href="https://paypal.me/simsimestore/${cart.reduce((total, item) => total + Number(item.price || 0), 0).toFixed(2)}" target="_blank" rel="noopener noreferrer" style="color: #0070ba; text-decoration: underline; font-weight: bold;">paypal.me/simsimestore</a>`;
+                status.textContent = error.message || "Could not connect to PayPal. Please try again.";
             }
         }
 
