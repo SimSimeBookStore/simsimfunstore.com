@@ -5,7 +5,15 @@ function hasSupabaseConnection() {
 async function getSupabaseUser() {
     if (!hasSupabaseConnection()) return null;
     const { data, error } = await window.supabaseClient.auth.getUser();
-    if (error && error.name !== "AuthSessionMissingError") throw error;
+    if (error) {
+        const invalidSession = error.name === "AuthSessionMissingError" || error.code === "session_not_found";
+        if (invalidSession) {
+            await window.supabaseClient.auth.signOut({ scope: "local" }).catch(() => {});
+            localStorage.removeItem("simsim_user");
+            return null;
+        }
+        throw error;
+    }
     return data.user;
 }
 

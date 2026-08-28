@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        if (window.location.protocol === "http:") {
+        if (window.location.protocol === "http:" && ["simsimfunstore.com", "www.simsimfunstore.com"].includes(window.location.hostname)) {
             window.location.replace(`https://${window.location.host}${window.location.pathname}${window.location.search}${window.location.hash}`);
         }
     </script>
@@ -117,13 +117,17 @@
             if (!window.supabaseClient) {
                 throw new Error("Online checkout is not available on this page.");
             }
-            const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
-            if (sessionError) throw sessionError;
-            if (sessionData.session?.access_token) {
-                const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
-                if (!userError && userData.user?.id) return sessionData.session.access_token;
-                await window.supabaseClient.auth.signOut();
+            try {
+                const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+                if (sessionData.session?.access_token) {
+                    const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
+                    if (!userError && userData.user?.id) return sessionData.session.access_token;
+                }
+            } catch (error) {
+                console.warn("Checkout session is no longer valid.", error);
             }
+            await window.supabaseClient.auth.signOut({ scope: "local" }).catch(() => {});
             localStorage.removeItem("simsim_user");
             window.location.assign("login.html?returnTo=cart.html");
             return null;
