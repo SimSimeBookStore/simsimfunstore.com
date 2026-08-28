@@ -14,6 +14,7 @@ const PRODUCT_PRICES = {
 const ALLOWED_ORIGINS = new Set([
     "https://simsimfunstore.com",
     "https://www.simsimfunstore.com",
+    "https://simsimebookstore.github.io",
     "https://simsimfunstore-com.pages.dev"
 ]);
 
