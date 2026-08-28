@@ -40,34 +40,27 @@ async function getUserLibraryMerged(userEmail) {
     }
 
     const localKey = email ? `simsim_library_${email}` : null;
-    let localLibrary = localKey ? (JSON.parse(localStorage.getItem(localKey)) || []) : [];
 
-    // Hydrate local items with catalog product details if available
-    localLibrary = localLibrary.map(item => {
+    if (hasSupabaseConnection()) {
+        try {
+            const onlineLibrary = await loadLibraryFromSupabase();
+            if (onlineLibrary !== null) {
+                if (localKey) {
+                    localStorage.setItem(localKey, JSON.stringify(onlineLibrary));
+                }
+                return onlineLibrary;
+            }
+        } catch (error) {
+            console.error("Could not load online library, using local storage fallback.", error);
+        }
+    }
+
+    let localLibrary = localKey ? (JSON.parse(localStorage.getItem(localKey)) || []) : [];
+    return localLibrary.map(item => {
         const catalogProduct = (typeof SIMSIM_PRODUCTS !== "undefined" && Array.isArray(SIMSIM_PRODUCTS))
             ? SIMSIM_PRODUCTS.find(p => p.id === item.id)
             : null;
         return catalogProduct ? { ...catalogProduct, ...item } : item;
     });
-
-    if (hasSupabaseConnection()) {
-        try {
-            const onlineLibrary = await loadLibraryFromSupabase();
-            if (Array.isArray(onlineLibrary) && onlineLibrary.length > 0) {
-                onlineLibrary.forEach(onlineItem => {
-                    if (!localLibrary.some(localItem => localItem.id === onlineItem.id)) {
-                        localLibrary.push(onlineItem);
-                    }
-                });
-                if (localKey) {
-                    localStorage.setItem(localKey, JSON.stringify(localLibrary));
-                }
-            }
-        } catch (error) {
-            console.error("Could not load the online library.", error);
-        }
-    }
-
-    return localLibrary;
 }
 

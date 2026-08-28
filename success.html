@@ -134,7 +134,16 @@
             const currentUser = pendingCheckout.user || localStorage.getItem("simsim_user");
             if (currentUser) {
                 const libraryKey = `simsim_library_${currentUser}`;
-                let userLibrary = JSON.parse(localStorage.getItem(libraryKey)) || [];
+                let userLibrary = [];
+                if (hasSupabaseConnection()) {
+                    try {
+                        const online = await loadLibraryFromSupabase();
+                        if (online !== null) userLibrary = online;
+                    } catch (e) {}
+                }
+                if (userLibrary.length === 0) {
+                    userLibrary = JSON.parse(localStorage.getItem(libraryKey)) || [];
+                }
                 cart.forEach(item => {
                     const catalogProduct = typeof SIMSIM_PRODUCTS !== "undefined"
                         ? SIMSIM_PRODUCTS.find(product => product.id === item.id)
