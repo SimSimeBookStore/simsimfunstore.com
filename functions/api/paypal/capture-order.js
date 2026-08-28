@@ -7,7 +7,7 @@ export function onRequestOptions({ request }) {
 export async function onRequestPost({ request, env }) {
     try {
         const user = await getUser(request, env);
-        if (!user?.id) return json({ error: "Please sign in before paying." }, 401, request);
+        if (!user?.id) return json({ error: "Your checkout session expired. Return to your cart and try PayPal checkout again." }, 401, request);
 
         const body = await request.json();
         const orderId = typeof body.orderId === "string" ? body.orderId : "";

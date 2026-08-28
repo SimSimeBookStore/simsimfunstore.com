@@ -119,7 +119,11 @@
             }
             const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
             if (sessionError) throw sessionError;
-            if (sessionData.session?.access_token) return sessionData.session.access_token;
+            if (sessionData.session?.access_token) {
+                const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
+                if (!userError && userData.user?.id) return sessionData.session.access_token;
+                await window.supabaseClient.auth.signOut();
+            }
 
             const { data, error } = await window.supabaseClient.auth.signInAnonymously();
             if (error || !data.session?.access_token) {

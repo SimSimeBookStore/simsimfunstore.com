@@ -7,7 +7,7 @@ export function onRequestOptions({ request }) {
 export async function onRequestPost({ request, env }) {
     try {
         const user = await getUser(request, env);
-        if (!user?.id) return json({ error: "Please sign in before paying." }, 401, request);
+        if (!user?.id) return json({ error: "Your checkout session could not be verified. Please try PayPal checkout again." }, 401, request);
 
         const body = await request.json();
         const items = Array.isArray(body.items) ? body.items : [];
