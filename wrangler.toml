@@ -6,6 +6,7 @@ pages_build_output_dir = "public"
 PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com"
 STORE_ORIGIN = "https://www.simsimfunstore.com"
 SUPABASE_URL = "https://vcsfpaemlxofgbtuksct.supabase.co"
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_0DwiZpdMj9Bjt8xUcjWg9g_HoWh71f1"
 
 [[d1_databases]]
 binding = "DB"

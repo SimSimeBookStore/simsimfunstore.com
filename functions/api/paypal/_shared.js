@@ -57,9 +57,9 @@ function options(request) {
 
 async function getUser(request, env) {
     const authorization = request.headers.get("authorization");
-    if (!authorization || !env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return null;
+    if (!authorization || !env.SUPABASE_URL || !env.SUPABASE_PUBLISHABLE_KEY) return null;
     const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-        headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, authorization }
+        headers: { apikey: env.SUPABASE_PUBLISHABLE_KEY, authorization }
     });
     return response.ok ? response.json() : null;
 }
