@@ -18,7 +18,7 @@ export async function onRequestPost({ request, env }) {
 
         const total = ids.reduce((sum, id) => sum + PRODUCT_PRICES[id], 0);
         const accessToken = await getPayPalToken(env);
-        const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+        const apiBase = env.PAYPAL_API_BASE || "https://api-m.paypal.com";
         const checkoutOrigin = storeOrigin(request, env);
         const response = await fetch(`${apiBase}/v2/checkout/orders`, {
             method: "POST",

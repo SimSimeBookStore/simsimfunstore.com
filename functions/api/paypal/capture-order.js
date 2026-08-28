@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
 
         const expectedTotal = storedOrder.total_cents / 100;
         const accessToken = await getPayPalToken(env);
-        const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+        const apiBase = env.PAYPAL_API_BASE || "https://api-m.paypal.com";
         const orderResponse = await fetch(`${apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
             headers: { authorization: `Bearer ${accessToken}` }
         });

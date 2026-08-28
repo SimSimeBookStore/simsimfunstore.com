@@ -28,7 +28,7 @@ export async function onRequestPost({ request, env }) {
         }
 
         const accessToken = await getPayPalToken(env);
-        const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+        const apiBase = env.PAYPAL_API_BASE || "https://api-m.paypal.com";
         const orderResponse = await fetch(`${apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
             headers: { authorization: `Bearer ${accessToken}` }
         });
@@ -48,7 +48,7 @@ export async function onRequestPost({ request, env }) {
 
 async function verifyWebhookSignature(request, body, env) {
     const accessToken = await getPayPalToken(env);
-    const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+    const apiBase = env.PAYPAL_API_BASE || "https://api-m.paypal.com";
     const response = await fetch(`${apiBase}/v1/notifications/verify-webhook-signature`, {
         method: "POST",
         headers: {

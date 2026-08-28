@@ -69,7 +69,7 @@ async function getUser(request, env) {
 
 async function getPayPalToken(env) {
     const credentials = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`);
-    const response = await fetch(`${env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com"}/v1/oauth2/token`, {
+    const response = await fetch(`${env.PAYPAL_API_BASE || "https://api-m.paypal.com"}/v1/oauth2/token`, {
         method: "POST",
         headers: {
             authorization: `Basic ${credentials}`,
