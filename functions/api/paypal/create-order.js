@@ -1,4 +1,4 @@
-import { PRODUCT_PRICES, getPayPalToken, getUser, json, options, saveOrder } from "./_shared.js";
+import { PRODUCT_PRICES, getPayPalToken, getUser, json, options, saveOrder, storeOrigin } from "./_shared.js";
 
 export function onRequestOptions({ request }) {
     return options(request);
@@ -19,6 +19,7 @@ export async function onRequestPost({ request, env }) {
         const total = ids.reduce((sum, id) => sum + PRODUCT_PRICES[id], 0);
         const accessToken = await getPayPalToken(env);
         const apiBase = env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+        const checkoutOrigin = storeOrigin(request, env);
         const response = await fetch(`${apiBase}/v2/checkout/orders`, {
             method: "POST",
             headers: {
@@ -36,8 +37,8 @@ export async function onRequestPost({ request, env }) {
                 application_context: {
                     brand_name: "SimSim Fun Store",
                     user_action: "PAY_NOW",
-                    return_url: `${env.STORE_ORIGIN || "https://www.simsimfunstore.com"}/success.html`,
-                    cancel_url: `${env.STORE_ORIGIN || "https://www.simsimfunstore.com"}/cart.html`
+                    return_url: `${checkoutOrigin}/success.html`,
+                    cancel_url: `${checkoutOrigin}/cart.html`
                 }
             })
         });
