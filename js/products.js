@@ -214,6 +214,18 @@ const SIMSIM_PRODUCTS = [
         videoUrl: ""
     },
     {
+        id: "kids-addition-puzzle",
+        title: "Kids Addition Puzzle",
+        type: "puzzle-game",
+        category: "Puzzle Game",
+        ageGroup: "Ages 4-8",
+        price: 3.50,
+        images: ["puzzle-game/games/kids-addition-puzzle/images/front.png"],
+        description: "Learn addition and find missing numbers through colorful, interactive puzzles.",
+        downloadUrl: "puzzle-game/games/kids-addition-puzzle/index.html",
+        videoUrl: ""
+    },
+    {
         id: "prod-10",
         title: "Masooka Wonderful Day",
         type: "video",

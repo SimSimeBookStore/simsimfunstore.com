@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add and find the Number</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Top Control Bar -->
+    <header class="game-header">
+        <button id="soundToggleBtn" class="icon-btn" aria-label="Toggle Sound">🔊</button>
+        <div id="modeIndicator" class="mode-badge hidden"></div>
+        <button id="changeModeBtn" class="action-btn hidden" aria-label="Change Game Mode">↩ Change Game</button>
+    </header>
+
+    <!-- Main Container -->
+    <main class="game-container">
+        
+        <!-- SCREEN 1: MODE SELECTION -->
+        <section id="modeSelectionScreen" class="screen active">
+            <h1 class="title">🌈 Let's Learn Addition! 🌈</h1>
+            <p class="subtitle">Choose Your Puzzle</p>
+            
+            <div class="modes-grid">
+                <!-- Option 1 -->
+                <div class="mode-card" data-mode="addition">
+                    <h2>➕ Add the Numbers</h2>
+                    <div class="visual-preview">
+                        <span class="preview-box"><img src="images/numbers/number-3.png" alt="3"></span>
+                        <img src="images/ui/plus.png" alt="Plus" class="preview-sign preview-operator">
+                        <span class="preview-box"><img src="images/numbers/number-4.png" alt="4"></span>
+                        <img src="images/ui/equale.png" alt="Equals" class="preview-sign preview-operator">
+                        <span class="preview-box question"><span>?</span></span>
+                    </div>
+                    <button class="play-btn">PLAY ADDITION</button>
+                </div>
+
+                <!-- Option 2 -->
+                <div class="mode-card" data-mode="missing">
+                    <h2>🔍 Find the Missing Number</h2>
+                    <div class="visual-preview">
+                        <span class="preview-box"><img src="images/numbers/number-3.png" alt="3"></span>
+                        <img src="images/ui/plus.png" alt="Plus" class="preview-sign preview-operator">
+                        <span class="preview-box question"><span>?</span></span>
+                        <img src="images/ui/equale.png" alt="Equals" class="preview-sign preview-operator">
+                        <span class="preview-box"><img src="images/numbers/number-7.png" alt="7"></span>
+                    </div>
+                    <button class="play-btn">FIND THE NUMBER</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: GAMEPLAY -->
+        <section id="gameScreen" class="screen">
+            <div class="score-board">
+                <span id="scoreDisplay">⭐ Score: 0</span>
+                <span id="questionCountDisplay">Question: 1</span>
+            </div>
+
+            <!-- Equation Display Area -->
+            <div class="equation-wrapper" id="equationWrapper">
+                <!-- Box 1 -->
+                <div class="eq-box" id="box1" data-index="1"></div>
+                <img src="images/ui/plus.png" alt="Plus" class="operator-img">
+                
+                <!-- Box 2 -->
+                <div class="eq-box" id="box2" data-index="2"></div>
+                <img src="images/ui/equale.png" alt="Equals" class="operator-img">
+                
+                <!-- Box 3 -->
+                <div class="eq-box" id="box3" data-index="3"></div>
+            </div>
+
+            <!-- Feedback Message Area -->
+            <div id="feedbackMessage" class="feedback-msg"></div>
+
+            <!-- Draggable Answer Choices Area -->
+            <div class="choices-container" id="choicesContainer"></div>
+        </section>
+
+    </main>
+
+    <!-- Confetti / Particle Container -->
+    <div id="confettiContainer" class="confetti-container"></div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
