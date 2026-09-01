@@ -88,6 +88,7 @@
                         <input id="brush-size" type="range" min="2" max="24" value="8" style="width: 90px;">
                     </label>
                     <button id="eraser-button" onclick="toggleEraser()" class="btn" style="padding: 5px 12px;">Eraser ✏️</button>
+                    <button id="bucket-button" onclick="toggleBucket()" class="btn" style="padding: 5px 12px;" aria-pressed="false">Fill Bucket 🪣</button>
                     <button id="undo-button" onclick="undoLastStroke()" class="btn" style="padding: 5px 12px;" disabled>Undo ↶</button>
                     <button onclick="clearCanvas()" class="btn" style="background: #e53e3e; padding: 5px 12px; font-size: 0.9rem;">Clear 🧹</button>
                     <button onclick="changeZoom(-0.25)" class="btn" style="padding: 5px 12px;">Zoom Out −</button>
@@ -120,6 +121,7 @@
         let pageHistories = {};
         let pdfDocument = null;
         let eraserEnabled = false;
+        let bucketEnabled = false;
         let strokeCanvas = null;
         let strokeContext = null;
         let strokeBase = null;
@@ -228,10 +230,31 @@
 
         function toggleEraser() {
             eraserEnabled = !eraserEnabled;
+            if (eraserEnabled) bucketEnabled = false;
+            updateToolButtons();
+        }
+
+        function toggleBucket() {
+            bucketEnabled = !bucketEnabled;
+            if (bucketEnabled) eraserEnabled = false;
+            updateToolButtons();
+        }
+
+        function updateToolButtons() {
             const eraserButton = document.getElementById("eraser-button");
-            eraserButton.textContent = eraserEnabled ? "Eraser On 🧽" : "Eraser ✏️";
-            eraserButton.style.background = eraserEnabled ? "#718096" : "";
-            eraserButton.style.color = eraserEnabled ? "white" : "";
+            const bucketButton = document.getElementById("bucket-button");
+            if (eraserButton) {
+                eraserButton.textContent = eraserEnabled ? "Eraser On 🧽" : "Eraser ✏️";
+                eraserButton.style.background = eraserEnabled ? "#718096" : "";
+                eraserButton.style.color = eraserEnabled ? "white" : "";
+                eraserButton.setAttribute("aria-pressed", String(eraserEnabled));
+            }
+            if (bucketButton) {
+                bucketButton.textContent = bucketEnabled ? "Bucket On 🪣" : "Fill Bucket 🪣";
+                bucketButton.style.background = bucketEnabled ? "#3182ce" : "";
+                bucketButton.style.color = bucketEnabled ? "white" : "";
+                bucketButton.setAttribute("aria-pressed", String(bucketEnabled));
+            }
         }
 
         function updateUndoButton() {
@@ -262,17 +285,22 @@
             let painting = false;
 
             canvas.addEventListener("pointerdown", (e) => {
-                painting = true;
-                canvas.setPointerCapture(e.pointerId);
                 if (!pageHistories[currentPage]) pageHistories[currentPage] = [];
                 pageHistories[currentPage].push(canvas.toDataURL("image/png"));
                 updateUndoButton();
+                const point = getCanvasPoint(e);
+                if (bucketEnabled) {
+                    fillRegion(point.x, point.y);
+                    saveCurrentDrawing();
+                    return;
+                }
+                painting = true;
+                canvas.setPointerCapture(e.pointerId);
                 strokeBase = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 strokeCanvas = document.createElement("canvas");
                 strokeCanvas.width = canvas.width;
                 strokeCanvas.height = canvas.height;
                 strokeContext = strokeCanvas.getContext("2d");
-                const point = getCanvasPoint(e);
                 regionMask = createRegionMask(point.x, point.y);
                 strokeContext.beginPath();
                 strokeContext.moveTo(point.x, point.y);
@@ -321,6 +349,30 @@
                     });
                 }
                 return mask;
+            }
+
+            function fillRegion(startX, startY) {
+                const mask = createRegionMask(startX, startY);
+                const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const color = hexToRgb(penColor);
+                for (let index = 0; index < mask.length; index++) {
+                    if (!mask[index]) continue;
+                    const pixel = index * 4;
+                    image.data[pixel] = color.red;
+                    image.data[pixel + 1] = color.green;
+                    image.data[pixel + 2] = color.blue;
+                    image.data[pixel + 3] = 255;
+                }
+                ctx.putImageData(image, 0, 0);
+            }
+
+            function hexToRgb(color) {
+                const value = Number.parseInt(color.slice(1), 16);
+                return {
+                    red: (value >> 16) & 255,
+                    green: (value >> 8) & 255,
+                    blue: value & 255
+                };
             }
 
             function renderConstrainedStroke() {
