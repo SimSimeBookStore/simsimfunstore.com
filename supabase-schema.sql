@@ -31,3 +31,32 @@ create policy "Users can read their own purchases"
     to authenticated
     using ((select auth.uid()) = user_id);
 
+create table if not exists public.site_stats (
+    key text primary key,
+    visits bigint not null default 0
+);
+
+alter table public.site_stats enable row level security;
+
+create or replace function public.increment_site_visitors()
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    current_visits bigint;
+begin
+    insert into public.site_stats (key, visits)
+    values ('homepage', 1)
+    on conflict (key) do update
+        set visits = public.site_stats.visits + 1
+    returning visits into current_visits;
+
+    return current_visits;
+end;
+$$;
+
+revoke all on function public.increment_site_visitors() from public;
+grant execute on function public.increment_site_visitors() to anon, authenticated;
+

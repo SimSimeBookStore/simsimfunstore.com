@@ -63,15 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function updateVisitorCounter() {
     const visitorCount = document.getElementById("visitor-count");
-    if (!visitorCount) return;
+    if (!visitorCount || !window.supabaseClient) return;
 
     try {
-        const response = await fetch("/api/visitors", { method: "POST" });
-        if (!response.ok) return;
-
-        const data = await response.json();
-        if (Number.isInteger(data.visits)) {
-            visitorCount.textContent = data.visits.toLocaleString();
+        const { data, error } = await window.supabaseClient.rpc("increment_site_visitors");
+        if (!error && Number.isInteger(data)) {
+            visitorCount.textContent = data.toLocaleString();
         }
     } catch (error) {
     }
