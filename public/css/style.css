@@ -496,6 +496,34 @@ footer {
     color: white;
 }
 
+.visitor-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 0.65rem 0.75rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffe66d, #ff9f68, #ff6b9a);
+    color: #57324d;
+    box-shadow: 0 4px 12px rgba(255, 107, 154, 0.2);
+    font-size: 0.82rem;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.visitor-counter-label {
+    white-space: nowrap;
+}
+
+.visitor-counter strong {
+    min-width: 2.2rem;
+    padding: 0.15rem 0.35rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #e04d75;
+    font-size: 1rem;
+}
+
 .share-menu {
     position: fixed;
     inset: 0;

@@ -8,6 +8,7 @@ if (window.location.hostname === "simsimfunstore.com" && window.location.hostnam
 document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
     checkUserSessionState();
+    updateVisitorCounter();
 
     // Render featured items on homepage if container exists
     const featuredContainer = document.getElementById("featured-products");
@@ -59,6 +60,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderFeaturedProducts(activeFilter);
 });
+
+async function updateVisitorCounter() {
+    const visitorCount = document.getElementById("visitor-count");
+    if (!visitorCount) return;
+
+    try {
+        const response = await fetch("/api/visitors", { method: "POST" });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (Number.isInteger(data.visits)) {
+            visitorCount.textContent = data.visits.toLocaleString();
+        }
+    } catch (error) {
+    }
+}
 
 // Persistent Login Check & Dynamic Navigation State
 function checkUserSessionState() {
