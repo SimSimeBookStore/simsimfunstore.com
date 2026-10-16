@@ -1,18 +1,18 @@
 const PRODUCT_PRICES = {
-    "prod-3": 5.00,
-    "prod-9": 5.00,
-    "prod-10": 5.00,
-    "prod-1": 3.00,
-    "prod-2": 4.85,
-    "prod-4": 4.85,
-    "prod-5": 4.85,
-    "prod-6": 4.85,
-    "prod-7": 4.85,
-    "prod-8": 4.85,
-    "game-find-the-animal": 3.00,
-    "game-collect-the-image": 3.00,
-    "game-count-the-animals": 3.50,
-    "kids-addition-puzzle": 3.50
+    "prod-3": 3.75,
+    "prod-9": 3.75,
+    "prod-10": 3.75,
+    "prod-1": 2.25,
+    "prod-2": 3.64,
+    "prod-4": 3.64,
+    "prod-5": 3.64,
+    "prod-6": 3.64,
+    "prod-7": 3.64,
+    "prod-8": 3.64,
+    "game-find-the-animal": 2.25,
+    "game-collect-the-image": 2.25,
+    "game-count-the-animals": 2.63,
+    "kids-addition-puzzle": 2.63
 };
 
 const ALLOWED_ORIGINS = new Set([
